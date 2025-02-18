@@ -28,7 +28,7 @@ or you can just read the description for more details .
 ### 4. Map View for Station Layout  
 - **Interactive Map**: Users can toggle to a standard map view in order to see a full layout of the station. The map displays:
 - **Location of the User Currently**: It is marked with a pin for easy identification by users of where they are
-- **Facility Locations**: Places containing toilets, food stalls, platforms, and services are all highlighted
+- **Facility Locations**: Places containing toilets, food stalls, platforms, and services are all highlighted 
 - **Compatibility with Search**: The map integrates automatically with the search in that it lets the user click on any location and view the distance and directions.
 - **Routing**: Whenever you select a destination, it will automatically determine the best routing within the station and give you turn-by-turn directions in either map view or AR.
 
