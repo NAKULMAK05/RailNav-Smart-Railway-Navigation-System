@@ -7,7 +7,7 @@ or you can just read the description for more details .
 # Railway Navigator     
 
 **Railway Navigator** app enhances the navigation experience within railway stations through the integration of real-time data, augmented reality technology, and vital station information. Here is an in-depth view about how the **Railway Station Navigation** system functions through the application interface: 
-    
+     
 ### 1. Real-Time Navigation    
 - **User Location Tracking**: This app is going to use GPS tracking in the real-time location of users within the railway station. As long as a user keeps on changing locations, his position would be reflected on the map to help him navigate through the physical layout of the station.
 - **Locate Facilities**: App users may look for any number of different facilities, including food stalls, toilets, waiting areas, and so on. It will show them the nearest available facility and send them in the right direction to get there.     
