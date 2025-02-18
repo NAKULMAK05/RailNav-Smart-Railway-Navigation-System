@@ -20,7 +20,7 @@ or you can just read the description for more details .
 ### 3. Facility Information and Amenities     
    - The app sheds light on the most important facilities or amenities on the railway station, such as:   
      - Toilets. Distinguish with signboards so that you know where the nearest toilet is located  
-     - Movable or stationary food courts/stalls: The app could take you to railway station places where you can eat within the area and informs how far the place is and the expected walking time. 
+     - Movable or stationary food courts/stalls: The app could take you to railway station places where you can eat within the area and informs how far the place is and the expected walking time.  
 - **ATMs**: For users that will use cash, the map and augmented reality views show the nearest ATMs.
   Wheelchair Accessible: Stations providing accessible areas are noted in case users require such accessibility needs.   
 - **Platform Information**: As users reach the platforms, actual platform information like train schedules and numbers appears in the AR view so that users can quickly access important information without an app switch. 
