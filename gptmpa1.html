@@ -1,212 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Navigation with Professional 3D Arrow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="description" content="Professional AR Railway Navigation">
+  <title>Railway Navigator</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    body {
+    * {
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
       overflow: hidden;
       background-color: #f1f3f4;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     #map {
+      flex: 1;
       width: 100%;
-      height: 100vh;
+      height: 100%;
     }
 
-    #search-bar-container {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
-      width: calc(100% - 20px);
-      max-width: 400px;
-      padding: 15px;
-      background: rgba(40, 40, 55, 0.9);
-      border-radius: 8px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-    }
-
-    #search-bar-container input {
-      width: calc(100% - 20px);
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      border: none;
-      background-color: #2d2d3b;
-      color: #ffffff;
-      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
-    }
-
-    #info {
-      font-size: 15px;
-      color: #dddddd;
-    }
-
-    #info p {
-      margin: 5px 0;
-    }
-
-    #ar-container {
-      position: absolute;
-      bottom: 10px;
-      right: 2px;
-      width: calc(100% - 20px);
-      max-width: 400px;
-      height: 300px;
-      z-index: 2000;
-      border: 3px solid #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #000;
-      display: none;
-    }
-
-    #ar-container video {
+    .top-bar {
       position: absolute;
       top: 0;
       left: 0;
+      width: 100%;
+      padding: 10px;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .top-bar input {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 25px;
+      background: #f1f3f4;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .top-bar button {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #5f6368;
+    }
+
+    .info-panel {
+      position: absolute;
+      bottom: 70px;
+      left: 10px;
+      right: 10px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: none;
+    }
+
+    .info-panel p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #202124;
+    }
+
+    .info-panel p span {
+      font-weight: 500;
+      color: #1a73e8;
+    }
+
+    .button-container {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 1001;
+    }
+
+    .button-container button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #start-nav-btn { background: #1a73e8; }
+    #ar-btn { background: #ea4335; }
+    #ar-btn:disabled { background: #dadce0; cursor: not-allowed; }
+
+    #ar-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 0;
+      background: #000;
+      z-index: 2000;
+      overflow: hidden;
+      transition: height 0.3s ease;
+    }
+
+    #ar-container.active {
+      height: 50vh;
+    }
+
+    #ar-container video,
+    #ar-container canvas {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    #ar-container canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-    }
-
-    #enable-ar-btn {
-      position: absolute;
-      right: 10px;
-      bottom: 10px;
-      z-index: 1001;
-      padding: 10px 20px;
-      background-color: #ff5555;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
     .leaflet-routing-container {
-      background-color: #ffffff;
-      border: 2px solid #007BFF;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-      width: 300px;
-      color: #000;
-      padding: 15px;
+      background: #fff;
+      border: none;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 300px;
+      padding: 10px;
+      font-size: 14px;
       z-index: 1000;
     }
 
-    .leaflet-routing-alternatives-container {
-      background-color: #f9f9f9;
-      padding: 10px;
-      border-radius: 6px;
-    }
-
-    .leaflet-routing-container h3 {
-      color: #007BFF;
-      margin-top: 0;
-      margin-bottom: 10px;
-      font-size: 16px;
-      font-family: 'Arial', sans-serif;
-    }
-
-    .leaflet-routing-alt {
-      padding: 10px;
-      background-color: #e9ecef;
-      margin-bottom: 5px;
-      border-radius: 5px;
-    }
-
-    .leaflet-routing-instructions p {
-      margin: 5px 0;
-      font-size: 14px;
-      color: #333;
-    }
-
-    .leaflet-top.leaflet-right .leaflet-routing-container {
-      margin-top: 60px;
-    }
-
     @media (max-width: 480px) {
-      #search-bar-container {
-        width: calc(100% - 20px);
-        padding: 10px;
-      }
-
-      #search-bar-container input {
-        padding: 8px;
-        font-size: 14px;
-      }
-
-      #info {
-        font-size: 14px;
-      }
-
-      #enable-ar-btn {
-        padding: 8px 16px;
-        font-size: 14px;
-      }
-
-      #ar-container {
-        height: 250px;
-      }
+      .top-bar { padding: 8px; }
+      .top-bar input { padding: 10px; font-size: 14px; }
+      .info-panel { bottom: 60px; padding: 10px; }
+      .info-panel p { font-size: 12px; }
+      .button-container { flex-direction: column; gap: 5px; }
+      .button-container button { padding: 10px; font-size: 12px; }
+      #ar-container.active { height: 60vh; }
     }
   </style>
 </head>
 
 <body>
-
-  <div id="search-bar-container">
-    <input type="text" id="search" placeholder="Search for a place" />
-    <div id="info">
-      <p>Distance: <span id="distance"></span></p>
-      <p>Time: <span id="time"></span></p>
-    </div>
+  <div class="top-bar">
+    <button id="back-btn" style="display: none;">←</button>
+    <input type="text" id="search" placeholder="Search destination" aria-label="Search destination" />
+    <button id="voice-search-btn">🎤</button>
   </div>
   <div id="map"></div>
-  <button id="enable-ar-btn">Enable AR Navigation</button>
-
+  <div class="info-panel" id="info-panel">
+    <p>Distance: <span id="distance">--</span></p>
+    <p>Time: <span id="time">--</span></p>
+    <p>ETA: <span id="eta">--</span></p>
+    <p>Next Step: <span id="next-step">--</span></p>
+  </div>
+  <div class="button-container">
+    <button id="start-nav-btn">Start Navigation</button>
+    <button id="ar-btn" disabled>Enable AR</button>
+  </div>
   <div id="ar-container">
-    <video id="video" autoplay playsinline></video>
+    <video id="video" autoplay playsinline muted></video>
     <canvas id="ar-canvas"></canvas>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
-
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
   <script>
-    // Default Location
-    const defaultLatLng = [21.1522, 79.0888]; // Nagpur Railway Station
-
-    var map = L.map('map').setView(defaultLatLng, 14);
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-      attribution: 'Leaflet &copy; OpenStreetMap contributors',
-      maxZoom: 18
+    // Initialize Map
+    const map = L.map('map', { zoomControl: false }).setView([21.1522, 79.0888], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
     }).addTo(map);
 
-    var userMarker = L.marker(defaultLatLng, { draggable: true }).addTo(map);
-    var destinationLatLng = null;
-    var isARModeEnabled = false;
-    var arrowCanvas = document.getElementById('ar-canvas');
-    var arrowContext = arrowCanvas.getContext('2d');
-    var currentHeading = 0;
+    // State Variables
+    let userMarker = null;
+    let destinationLatLng = null;
+    let routingControl = null;
+    let isARModeEnabled = false;
+    let arrowCanvas = document.getElementById('ar-canvas');
+    let arrowContext = arrowCanvas.getContext('2d');
+    let currentHeading = 0;
+    let routeCoordinates = [];
+    let instructions = [];
 
-    // Custom locations for Nagpur Railway Station
+    // Hardcoded Nagpur Central Station Data
     const customLocations = {
       "nagpur railway station platform 1": { lat: 21.15243, lng: 79.08837 },
       "nagpur railway station platform 2": { lat: 21.15230, lng: 79.08850 },
@@ -221,135 +217,189 @@
       "nagpur railway station restroom": { lat: 21.15247, lng: 79.08842 },
       "nagpur railway station waiting area": { lat: 21.15210, lng: 79.08830 },
       "nagpur railway station ticket counter": { lat: 21.15235, lng: 79.08820 },
-      "nagpur railway station entrance": { lat: 21.15260, lng: 79.08860 },
-      "kanchan regency": { lat: 21.17616, lng: 79.05371 }
+      "nagpur railway station entrance": { lat: 21.15260, lng: 79.08860 }
     };
 
-    // Initialize user location watch
-    function watchUserLocation() {
+    // Get User Location
+    function getUserLocation(callback) {
       if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(function (position) {
-          var lat = position.coords.latitude;
-          var lng = position.coords.longitude;
-          var userLatLng = L.latLng(lat, lng);
-
-          map.panTo(userLatLng, { animate: true });
-          userMarker.setLatLng(userLatLng);
-
-          if (destinationLatLng && isARModeEnabled) {
-            updateAR(currentHeading);
-          }
-        }, function () {
-          alert('Unable to retrieve your location.');
-        }, {
-          enableHighAccuracy: true
-        });
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const userLatLng = L.latLng(position.coords.latitude, position.coords.longitude);
+            if (!userMarker) {
+              userMarker = L.marker(userLatLng).addTo(map);
+            } else {
+              userMarker.setLatLng(userLatLng);
+            }
+            map.panTo(userLatLng, { animate: true });
+            callback(userLatLng);
+          },
+          () => alert('Unable to retrieve your location.'),
+          { enableHighAccuracy: true }
+        );
       } else {
-        alert('Geolocation is not supported by this browser.');
+        alert('Geolocation not supported.');
       }
     }
 
-    // Handle search and routing
-    document.getElementById('search').addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        var query = document.getElementById('search').value.toLowerCase();
+    // Watch User Location and Update Route
+    function watchUserLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+          (position) => {
+            const userLatLng = L.latLng(position.coords.latitude, position.coords.longitude);
+            userMarker.setLatLng(userLatLng);
+            map.panTo(userLatLng, { animate: true });
+            if (destinationLatLng && routingControl) {
+              updateRoute(userLatLng);
+              updateNavigationInfo(userLatLng);
+            }
+          },
+          () => console.error('Location watch failed'),
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+        );
+      }
+    }
 
-        // Check for custom locations
+    // Update Route with Recalculation
+    function updateRoute(userLatLng) {
+      if (routingControl) map.removeControl(routingControl);
+      routingControl = L.Routing.control({
+        waypoints: [userLatLng, destinationLatLng],
+        routeWhileDragging: false,
+        lineOptions: { styles: [{ color: '#1a73e8', weight: 5 }] },
+        show: true,
+        createMarker: () => null,
+        router: L.Routing.osrmv1({
+          serviceUrl: 'https://router.project-osrm.org/route/v1'
+        })
+      }).on('routesfound', (e) => {
+        const routes = e.routes[0];
+        routeCoordinates = routes.coordinates;
+        instructions = routes.instructions;
+        updateNavigationInfo(userLatLng);
+        document.getElementById('info-panel').style.display = 'block';
+        document.getElementById('ar-btn').disabled = false;
+      }).on('routingerror', (e) => {
+        console.error('Routing error:', e);
+        alert('Failed to calculate route. Retrying...');
+        updateRoute(userLatLng); // Retry on error
+      }).addTo(map);
+    }
+
+    // Update Navigation Info
+    function updateNavigationInfo(userLatLng) {
+      if (!routeCoordinates.length) return;
+
+      const totalDistance = userLatLng.distanceTo(destinationLatLng) / 1000; // km
+      const totalTime = routingControl._routes[0].summary.totalTime / 60; // mins
+      const eta = new Date(Date.now() + totalTime * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const nextInstruction = instructions.find((instr) => {
+        const point = routeCoordinates[instr.index];
+        return L.latLng(point.lat, point.lng).distanceTo(userLatLng) > 5;
+      }) || { text: 'Arrived at destination' };
+
+      document.getElementById('distance').innerHTML = `${totalDistance.toFixed(2)} km`;
+      document.getElementById('time').innerHTML = `${totalTime.toFixed(1)} mins`;
+      document.getElementById('eta').innerHTML = eta;
+      document.getElementById('next-step').innerHTML = nextInstruction.text;
+    }
+
+    // Search Handler
+    document.getElementById('search').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const query = e.target.value.toLowerCase().trim();
         if (customLocations[query]) {
           destinationLatLng = L.latLng(customLocations[query].lat, customLocations[query].lng);
           L.marker(destinationLatLng).addTo(map).bindPopup(query).openPopup();
-          map.setView(destinationLatLng, 14);
-
-          L.Routing.control({
-            waypoints: [userMarker.getLatLng(), destinationLatLng],
-            routeWhileDragging: true
-          }).on('routesfound', function (e) {
-            var routes = e.routes;
-            var summary = routes[0].summary;
-            document.getElementById('distance').innerHTML = (summary.totalDistance / 1000).toFixed(2) + ' km';
-            document.getElementById('time').innerHTML = (summary.totalTime / 60).toFixed(2) + ' minutes';
-
-            if (isARModeEnabled) {
-              updateAR(currentHeading);
-            }
-          }).addTo(map);
+          getUserLocation((userLatLng) => updateRoute(userLatLng));
         } else {
-          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
-            .then(response => response.json())
-            .then(data => {
-              if (data && data.length > 0) {
-                var latLng = L.latLng(parseFloat(data[0].lat), parseFloat(data[0].lon));
-                destinationLatLng = latLng;
-
-                L.Routing.control({
-                  waypoints: [userMarker.getLatLng(), latLng],
-                  routeWhileDragging: true
-                }).on('routesfound', function (e) {
-                  var routes = e.routes;
-                  var summary = routes[0].summary;
-                  document.getElementById('distance').innerHTML = (summary.totalDistance / 1000).toFixed(2) + ' km';
-                  document.getElementById('time').innerHTML = (summary.totalTime / 60).toFixed(2) + ' minutes';
-
-                  if (isARModeEnabled) {
-                    updateAR(currentHeading);
-                  }
-                }).addTo(map);
+          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`)
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.length) {
+                destinationLatLng = L.latLng(parseFloat(data[0].lat), parseFloat(data[0].lon));
+                L.marker(destinationLatLng).addTo(map).bindPopup(query).openPopup();
+                getUserLocation((userLatLng) => updateRoute(userLatLng));
               } else {
                 alert('Location not found!');
               }
             })
-            .catch(error => console.error('Error:', error));
+            .catch((err) => console.error('Search error:', err));
         }
       }
     });
 
-    // Enable AR Mode
-    document.getElementById('enable-ar-btn').addEventListener('click', function () {
+    // Start Navigation
+    document.getElementById('start-nav-btn').addEventListener('click', () => {
+      getUserLocation((userLatLng) => {
+        if (destinationLatLng) {
+          updateRoute(userLatLng);
+          document.getElementById('back-btn').style.display = 'inline-block';
+        } else {
+          alert('Please select a destination first!');
+        }
+      });
+    });
+
+    // Back Button
+    document.getElementById('back-btn').addEventListener('click', () => {
+      if (routingControl) map.removeControl(routingControl);
+      document.getElementById('info-panel').style.display = 'none';
+      document.getElementById('ar-btn').disabled = true;
+      document.getElementById('back-btn').style.display = 'none';
+      document.getElementById('ar-container').classList.remove('active');
+      isARModeEnabled = false;
+      if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
+      routeCoordinates = [];
+      instructions = [];
+    });
+
+    // AR Navigation
+    document.getElementById('ar-btn').addEventListener('click', () => {
       if (!isARModeEnabled) {
         isARModeEnabled = true;
-        document.getElementById('ar-container').style.display = 'block';
-        document.getElementById('enable-ar-btn').disabled = true;
+        document.getElementById('ar-container').classList.add('active');
+        document.getElementById('ar-btn').disabled = true;
         startAR();
       }
     });
 
     // Start AR
+    let video = document.getElementById('video');
     function startAR() {
-      const video = document.getElementById('video');
-      video.style.display = 'block';
-      arrowCanvas.style.display = 'block';
-
       navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-        .then(stream => {
+        .then((stream) => {
           video.srcObject = stream;
           video.play();
-
           video.addEventListener('loadeddata', () => {
             arrowCanvas.width = video.videoWidth;
             arrowCanvas.height = video.videoHeight;
-
             const updateFrame = () => {
-              updateAR(currentHeading);
+              if (isARModeEnabled) updateAR(currentHeading);
               requestAnimationFrame(updateFrame);
             };
             updateFrame();
           });
-        }).catch(error => {
-          console.error('Error accessing camera:', error);
+        })
+        .catch((err) => {
+          console.error('Error accessing camera:', err);
+          alert('Camera access failed. Please allow camera permissions.');
+          document.getElementById('ar-container').classList.remove('active');
+          isARModeEnabled = false;
+          document.getElementById('ar-btn').disabled = false;
         });
 
-      window.addEventListener('deviceorientation', function (event) {
-        currentHeading = event.alpha;
-        if (destinationLatLng && isARModeEnabled) {
-          updateAR(currentHeading);
-        }
-      });
+      window.addEventListener('deviceorientation', (event) => {
+        currentHeading = event.alpha || 0;
+        if (destinationLatLng && isARModeEnabled) updateAR(currentHeading);
+      }, true);
     }
 
-    // Update AR with current orientation
+    // Update AR
     function updateAR(compassHeading) {
-      if (!destinationLatLng) return;
-
+      if (!destinationLatLng || !userMarker) return;
       const userLatLng = userMarker.getLatLng();
       const destinationHeading = calculateHeading(userLatLng, destinationLatLng);
       const arrowRotation = (compassHeading - destinationHeading + 360) % 360;
@@ -358,16 +408,11 @@
       drawArrow(arrowContext, arrowCanvas.width / 2, arrowCanvas.height / 2, arrowRotation);
     }
 
-    // Draw 3D Arrow
+    // Draw Arrow
     function drawArrow(ctx, x, y, rotation) {
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(rotation * Math.PI / 180);
-
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-      ctx.shadowBlur = 10;
-      ctx.shadowOffsetX = 12;
-      ctx.shadowOffsetY = 8;
 
       ctx.beginPath();
       ctx.moveTo(-20, -70);
@@ -380,7 +425,7 @@
       ctx.lineTo(-20, -70);
       ctx.closePath();
 
-      ctx.fillStyle = '#007BFF';
+      ctx.fillStyle = '#1a73e8';
       ctx.fill();
       ctx.strokeStyle = '#000';
       ctx.lineWidth = 2;
@@ -389,7 +434,7 @@
       ctx.restore();
     }
 
-    // Calculate heading from user to destination
+    // Calculate Heading
     function calculateHeading(from, to) {
       const lat1 = from.lat * Math.PI / 180;
       const lat2 = to.lat * Math.PI / 180;
@@ -400,9 +445,25 @@
       return (heading + 360) % 360;
     }
 
-    // Watch user location
+    // Voice Search
+    document.getElementById('voice-search-btn').addEventListener('click', () => {
+      if ('webkitSpeechRecognition' in window) {
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.onresult = (event) => {
+          document.getElementById('search').value = event.results[0][0].transcript;
+          document.getElementById('search').dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter' }));
+        };
+        recognition.onerror = () => alert('Voice recognition failed.');
+        recognition.start();
+      } else {
+        alert('Voice search not supported.');
+      }
+    });
+
+    // Initialize
+    getUserLocation(() => {});
     watchUserLocation();
   </script>
 </body>
-
 </html>
