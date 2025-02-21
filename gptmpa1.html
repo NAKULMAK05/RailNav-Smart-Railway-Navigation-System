@@ -1,80 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AR Navigation with Professional 3D Arrow</title>
-  <link rel="stylesheet " href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
   <style>
-      /* Target the entire routing  container */
-      .leaflet-routing-container {
-        background-color: #ffffff;
-        /* Solid white background */
-        border: 2px solid #007BFF;
-        position: relative;
-        left:20px;
-        top:0px;
-        /* Blue border for emphasis */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        /* Light shadow for 3D effect */
-        border-radius: 8px;
-        /* Rounded corners */
-        width: 270px;
-        /* Adjust width */
-        color: #000;
-        /* Black text */
-      padding: 10px;
-      /* Spacing inside */ 
-      z-index: 3000;
-      /* Ensure it stays on top */
+    /* Routing Container */
+    .leaflet-routing-container {
+      background-color: #ffffff;
+      border: 2px solid #007BFF;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      width: 300px;
+      color: #000;
+      padding: 15px;
+      z-index: 1000;
     }
 
-    /* Target the direction steps inside the container */
     .leaflet-routing-alternatives-container {
       background-color: #f9f9f9;
-      /* Slightly lighter background for steps */
-      padding: 10px; 
-      /* Spacing for alternatives */
+      padding: 10px;
       border-radius: 6px;
-      /* Rounded corners */
     }
 
-    /* Target the header of the direction box */
     .leaflet-routing-container h3 {
       color: #007BFF;
-      /* Blue heading text */
-      margin-top: 0;
-      margin-bottom: 10px;
+      margin: 0 0 10px;
       font-size: 16px;
       font-family: 'Arial', sans-serif;
-      /* Clean, readable font */
     }
 
-    /* Customize the individual steps */
     .leaflet-routing-alt {
       padding: 10px;
       background-color: #e9ecef;
-      /* Light gray background for steps */
-      margin-bottom: 20px;
+      margin-bottom: 5px;
       border-radius: 5px;
     }
 
-    /* Customize the text in the routing steps */
     .leaflet-routing-instructions p {
       margin: 5px 0;
       font-size: 14px;
       color: #333;
-      /* Darker text for instructions */
     }
 
-    /* Customize hover effects for the steps */
-
-    /* Make sure the leaflet control doesn't overlap the map */
     .leaflet-top.leaflet-right .leaflet-routing-container {
-      margin-top: 10px;
-      /* Adjust position based on other controls */
+      margin-top: 60px;
     }
 
+    /* General Styles */
     body {
       margin: 0;
       padding: 0;
@@ -123,9 +98,8 @@
     #ar-container {
       position: absolute;
       bottom: 10px;
-      right: 2px;
-      width: calc(100% - 20px);
-      max-width: 400px;
+      right: 10px;
+      width: 400px;
       height: 300px;
       z-index: 2000;
       border: 3px solid #fff;
@@ -136,9 +110,6 @@
     }
 
     #ar-container video {
-      position: absolute;
-      top: 0;
-      left: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -165,74 +136,25 @@
       border-radius: 5px;
       cursor: pointer;
       font-size: 16px;
+      transition: background-color 0.3s;
     }
 
-    #boxi{
-      border: none;
-      border-radius: 5px;
+    #enable-ar-btn:hover {
+      background-color: #e64444;
     }
-
-    /* Media Queries for Mobile Devices */
-    @media (max-width: 768px) {
-      #search-bar-container {
-        width: calc(100% - 20px);
-        max-width: 100%;
-        padding: 10px;
-        top: 5px;
-        left: 5px;
-      }
-
-      #search-bar-container input {
-        width: calc(100% - 10px);
-        padding: 8px;
-        margin-bottom: 8px;
-        font-size: 14px;
-      }
-
-      #ar-container {
-        width: calc(100% - 20px);
-        height: 250px;
-        bottom: 5px;
-      }
-
-      #enable-ar-btn {
-        padding: 8px 16px;
-        font-size: 14px;
-        bottom: 5px;
-        right: 5px;
-      }
-
-      .leaflet-routing-container {
-        width: 50%;
-        top:10%;
-        padding: 10px;
-      }
-
-      .leaflet-routing-alt {
-        font-size: 12px;
-        padding: 8px;
-      }
-
-      .leaflet-routing-instructions p {
-        font-size: 12px;
-      }
-    }
-    
   </style>
 </head>
 
 <body>
-
   <div id="search-bar-container">
-    <input type="text" id="search" placeholder="Search for a place" />
+    <input type="text" id="search" placeholder="Search for a place or facility" />
     <div id="info">
-      <p>Distance: <span id="distance"></span></p>
-      <p>Time: <span id="time"></span></p>
+      <p>Distance: <span id="distance">--</span></p>
+      <p>Time: <span id="time">--</span></p>
     </div>
   </div>
   <div id="map"></div>
   <button id="enable-ar-btn">Enable AR Navigation</button>
-
   <div id="ar-container">
     <video id="video" autoplay playsinline></video>
     <canvas id="ar-canvas"></canvas>
@@ -242,91 +164,127 @@
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 
   <script>
-    // Default Location
-    const defaultLatLng = [47.210750, -122.542540];
-
-    var map = L.map('map').setView(defaultLatLng, 14);
+    // Default Location (Nagpur Central Station as fallback)
+    const defaultLatLng = [21.1522, 79.0888];
+    var map = L.map('map').setView(defaultLatLng, 15);
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-      attribution: 'Leaflet &copy; OpenStreetMap contributors',
-      maxZoom: 18
+      attribution: 'Leaflet © OpenStreetMap contributors',
+      maxZoom: 19
     }).addTo(map);
 
     var userMarker = L.marker(defaultLatLng).addTo(map);
     var destinationLatLng = null;
+    var routingControl = null;
     var isARModeEnabled = false;
+    var arrowCanvas = document.getElementById('ar-canvas');
+    var arrowContext = arrowCanvas.getContext('2d');
     var currentHeading = 0;
-    var req = 0;
-    var req1 = 0;
+    var routeCoordinates = [];
 
-    // Initialize user location watch
+    // Hardcoded Nagpur Central Station Facilities and Platforms
+    const customLocations = {
+      "nagpur railway station platform 1": { lat: 21.15243, lng: 79.08837 },
+      "nagpur railway station platform 2": { lat: 21.15230, lng: 79.08850 },
+      "nagpur railway station platform 3": { lat: 21.15220, lng: 79.08863 },
+      "nagpur railway station platform 4": { lat: 21.15218, lng: 79.08877 },
+      "nagpur railway station platform 5": { lat: 21.15194, lng: 79.08878 },
+      "nagpur railway station platform 6": { lat: 21.15185, lng: 79.08890 },
+      "nagpur railway station platform 7": { lat: 21.15175, lng: 79.08900 },
+      "nagpur railway station platform 8": { lat: 21.15165, lng: 79.08910 },
+      "nagpur railway station atm": { lat: 21.15157, lng: 79.08815 },
+      "nagpur railway station foodcourt": { lat: 21.15184, lng: 79.08856 },
+      "nagpur railway station restroom": { lat: 21.15247, lng: 79.08842 },
+      "nagpur railway station waiting area": { lat: 21.15210, lng: 79.08830 },
+      "nagpur railway station ticket counter": { lat: 21.15235, lng: 79.08820 },
+      "nagpur railway station entrance": { lat: 21.15260, lng: 79.08860 }
+    };
+
+    // Watch User Location and Update Map
     function watchUserLocation() {
       if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(function (position) {
-          var lat = position.coords.latitude;
-          var lng = position.coords.longitude;
-          var userLatLng = L.latLng(lat, lng);
+        navigator.geolocation.watchPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const userLatLng = L.latLng(lat, lng);
 
-          map.setView(userLatLng, 14);
-          userMarker.setLatLng(userLatLng);
+            userMarker.setLatLng(userLatLng);
+            map.panTo(userLatLng); // Smoothly follow user
 
-          if (destinationLatLng && isARModeEnabled) {
-            updateAR(currentHeading);
-          }
-        }, function () {
-          alert('Unable to retrieve your location.');
-        }, {
-          enableHighAccuracy: true
-        });
+            if (destinationLatLng) {
+              updateRoute(userLatLng);
+            }
+          },
+          () => {
+            alert('Unable to retrieve your location.');
+          },
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+        );
       } else {
         alert('Geolocation is not supported by this browser.');
       }
     }
 
-    // Handle search and routing
-    document.getElementById('search').addEventListener('keypress', function (e) {
+    // Update Route Dynamically
+    function updateRoute(userLatLng) {
+      if (routingControl) {
+        map.removeControl(routingControl);
+      }
+
+      routingControl = L.Routing.control({
+        waypoints: [userLatLng, L.latLng(destinationLatLng.lat, destinationLatLng.lng)],
+        routeWhileDragging: true,
+        lineOptions: { styles: [{ color: '#007BFF', weight: 4 }] },
+        show: true,
+        createMarker: () => null // Use existing markers
+      }).on('routesfound', (e) => {
+        const routes = e.routes;
+        const summary = routes[0].summary;
+        routeCoordinates = routes[0].coordinates; // Store route points for AR
+        document.getElementById('distance').innerHTML = `${(summary.totalDistance / 1000).toFixed(2)} km`;
+        document.getElementById('time').innerHTML = `${(summary.totalTime / 60).toFixed(2)} minutes`;
+
+        if (isARModeEnabled) {
+          updateAR(currentHeading);
+        }
+      }).addTo(map);
+    }
+
+    // Handle Search and Routing
+    document.getElementById('search').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
-        var query = document.getElementById('search').value;
+        const query = document.getElementById('search').value.toLowerCase().trim();
 
-        // Fetch from geocoding API
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
-          .then(response => response.json())
-          .then(data => {
-            if (data && data.length > 0) {
-              var latLng = L.latLng(parseFloat(data[0].lat), parseFloat(data[0].lon));
-              destinationLatLng = latLng;
-
-              // Add routing control
-              L.Routing.control({
-                waypoints: [
-                  userMarker.getLatLng(),
-                  L.latLng(latLng.lat, latLng.lng)
-                ],
-                routeWhileDragging: true
-              }).on('routesfound', function (e) {
-                var routes = e.routes;
-                var summary = routes[0].summary;
-                document.getElementById('distance').innerHTML = (summary.totalDistance / 1000).toFixed(2) + ' km';
-                document.getElementById('time').innerHTML = (summary.totalTime / 60).toFixed(2) + ' minutes';
-
-                if (isARModeEnabled) {
-                  updateAR(currentHeading);
-                }
-              }).addTo(map);
-            } else {
-              alert('Location not found!');
-            }
-          })
-          .catch(error => console.error('Error:', error));
+        if (customLocations[query]) {
+          destinationLatLng = L.latLng(customLocations[query].lat, customLocations[query].lng);
+          L.marker(destinationLatLng).addTo(map).bindPopup(query).openPopup();
+          updateRoute(userMarker.getLatLng());
+        } else {
+          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data && data.length > 0) {
+                destinationLatLng = L.latLng(parseFloat(data[0].lat), parseFloat(data[0].lon));
+                L.marker(destinationLatLng).addTo(map).bindPopup(query).openPopup();
+                updateRoute(userMarker.getLatLng());
+              } else {
+                alert('Location not found!');
+              }
+            })
+            .catch((error) => console.error('Error:', error));
+        }
       }
     });
 
     // Enable AR Mode
-    document.getElementById('enable-ar-btn').addEventListener('click', function () {
-      if (!isARModeEnabled) {
+    document.getElementById('enable-ar-btn').addEventListener('click', () => {
+      if (!isARModeEnabled && destinationLatLng) {
         isARModeEnabled = true;
         document.getElementById('ar-container').style.display = 'block';
         document.getElementById('enable-ar-btn').disabled = true;
         startAR();
+      } else if (!destinationLatLng) {
+        alert('Please select a destination first!');
       }
     });
 
@@ -337,29 +295,95 @@
       arrowCanvas.style.display = 'block';
 
       navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-        .then(stream => {
+        .then((stream) => {
           video.srcObject = stream;
           video.play();
-        }).catch(error => {
+
+          video.addEventListener('loadeddata', () => {
+            arrowCanvas.width = video.videoWidth;
+            arrowCanvas.height = video.videoHeight;
+            const updateFrame = () => {
+              updateAR(currentHeading);
+              requestAnimationFrame(updateFrame);
+            };
+            updateFrame();
+          });
+        })
+        .catch((error) => {
           console.error('Error accessing camera:', error);
+          alert('Camera access denied or unavailable.');
         });
 
-      // AR Update Loop
-      const updateFrame = () => {
-        updateAR(currentHeading);
-        requestAnimationFrame(updateFrame);
-      };
-      updateFrame();
+      window.addEventListener('deviceorientation', (event) => {
+        currentHeading = event.alpha || 0; // Fallback to 0 if alpha is null
+        if (destinationLatLng && isARModeEnabled) {
+          updateAR(currentHeading);
+        }
+      });
     }
 
-    // Dummy function to simulate AR update
-    function updateAR(heading) {
-      // Placeholder: Implement actual AR functionality here
+    // Update AR with Route-Based Direction
+    function updateAR(compassHeading) {
+      if (!destinationLatLng || !routeCoordinates.length) return;
+
+      const userLatLng = userMarker.getLatLng();
+      const nextPoint = routeCoordinates.find((coord) => {
+        const dist = L.latLng(coord.lat, coord.lng).distanceTo(userLatLng);
+        return dist > 5; // Find the next point > 5m away
+      }) || destinationLatLng; // Fallback to destination
+
+      const destinationHeading = calculateHeading(userLatLng, nextPoint);
+      const arrowRotation = (compassHeading - destinationHeading + 360) % 360;
+
+      arrowContext.clearRect(0, 0, arrowCanvas.width, arrowCanvas.height);
+      drawArrow(arrowContext, arrowCanvas.width / 2, arrowCanvas.height / 2, arrowRotation);
     }
 
+    // Draw 3D Arrow
+    function drawArrow(ctx, x, y, rotation) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rotation * Math.PI / 180);
+
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetX = 12;
+      ctx.shadowOffsetY = 8;
+
+      ctx.beginPath();
+      ctx.moveTo(-20, -70);
+      ctx.lineTo(20, -70);
+      ctx.lineTo(20, 0);
+      ctx.lineTo(40, 0);
+      ctx.lineTo(0, 100);
+      ctx.lineTo(-40, 0);
+      ctx.lineTo(-20, 0);
+      ctx.lineTo(-20, -70);
+      ctx.closePath();
+
+      ctx.fillStyle = '#007BFF';
+      ctx.fill();
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // Calculate Heading
+    function calculateHeading(from, to) {
+      const lat1 = from.lat * Math.PI / 180;
+      const lat2 = to.lat * Math.PI / 180;
+      const dLon = (to.lng - from.lng) * Math.PI / 180;
+      const y = Math.sin(dLon) * Math.cos(lat2);
+      const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+      const heading = Math.atan2(y, x) * 180 / Math.PI;
+      return (heading + 360) % 360;
+    }
+
+    // Start Watching User Location
     watchUserLocation();
   </script>
-
 </body>
 
 </html>
