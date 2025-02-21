@@ -3,8 +3,9 @@ body {
     font-family: 'Roboto', sans-serif;
     background-color: #f7f9fc;
     color: #333;
-    margin: 0 px;
-    padding: 0 px;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
     transition: background-color 0.3s, color 0.3s;
 }
 
@@ -13,17 +14,20 @@ body.dark-mode {
     color: #e0e0e0;
 }
 
+/* Header */
 header {
     background-color: #004c99;
     color: white;
-    padding: 15 px;
+    padding: 1rem 2rem;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 header .logo h1 {
-    font-size: 1.8 em;
+    font-size: 1.8rem;
     font-weight: 600;
     margin: 0;
 }
@@ -33,56 +37,65 @@ header nav ul {
     margin: 0;
     padding: 0;
     display: flex;
-}
-
-header nav ul li {
-    margin-left: 20px;
+    gap: 1.5rem;
 }
 
 header nav ul li a {
     color: white;
     text-decoration: none;
-    font-size: 1.1 em;
+    font-size: 1.1rem;
     font-weight: 500;
     transition: color 0.3s ease;
 }
 
 header nav ul li a:hover {
-    color: #ddd;
+    color: #b3d4ff;
 }
 
 .search-container {
     display: flex;
     align-items: center;
+    margin-top: 1rem;
+    flex-grow: 1;
+    max-width: 400px;
 }
 
 .search-container input[type="text"] {
-    padding: 8px 12px;
+    padding: 0.6rem 1rem;
     border-radius: 20px 0 0 20px;
     border: 1px solid #ccc;
-    font-size: 1em;
-    width: 250px;
+    font-size: 1rem;
+    width: 100%;
     outline: none;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-container input[type="text"]:focus {
+    border-color: #004c99;
+    box-shadow: 0 0 5px rgba(0, 76, 153, 0.5);
 }
 
 body.dark-mode .search-container input[type="text"] {
     border-color: #666;
-    background-color: #444;
+    background-color: #2c2c2c;
     color: #e0e0e0;
 }
 
 .search-container button {
-    background-color: #ccc;
+    background-color: #004c99;
     border: none;
     border-radius: 0 20px 20px 0;
-    padding: 8px 12px;
+    padding: 0.6rem 1rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
+.search-container button i {
+    color: white;
+}
+
 .search-container button:hover {
-    background-color: #bbb;
+    background-color: #003366;
 }
 
 body.dark-mode .search-container button {
@@ -93,31 +106,32 @@ body.dark-mode .search-container button:hover {
     background-color: #444;
 }
 
+/* Options Navigation */
 nav.options {
     display: flex;
-    justify-content: space-around;
-    margin: 20px 0;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 2rem 1rem;
+    flex-wrap: wrap;
 }
 
 nav.options button {
     background-color: #004c99;
     color: white;
     border: none;
-    padding: 10px 20px;
-    font-size: 1em;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
     cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-}
-
-nav.options button i {
-    margin-right: 8px;
+    gap: 0.5rem;
+    transition: background-color 0.3s ease, transform 0.2s;
 }
 
 nav.options button:hover {
     background-color: #003366;
+    transform: translateY(-2px);
 }
 
 body.dark-mode nav.options button {
@@ -128,34 +142,37 @@ body.dark-mode nav.options button:hover {
     background-color: #121212;
 }
 
+/* Main Content */
 main {
     width: 90%;
-    margin: 20px auto;
-    padding: 20px;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
     background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 body.dark-mode main {
-    background-color: #333;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    background-color: #1e1e1e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .station-info {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 2rem;
 }
 
-.info-container {
-    width: 48%;
+.info-container, .facilities {
+    flex: 1;
+    min-width: 300px;
 }
 
 .arrival-info h2 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
+    font-size: 1.6rem;
+    margin-bottom: 0.8rem;
     color: #004c99;
     transition: color 0.3s;
 }
@@ -164,30 +181,25 @@ body.dark-mode .arrival-info h2 {
     color: #bb86fc;
 }
 
-.arrival-info h2 span {
-    font-weight: bold;
-}
-
 .crowd-density h3 {
-    font-size: 1.3em;
-    margin-bottom: 10px;
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
 }
 
 .crowd-bar {
     display: flex;
-    justify-content: space-between;
     background-color: #e0e0e0;
-    border-radius: 5px;
+    border-radius: 8px;
     overflow: hidden;
-    margin-bottom: 10px;
+    height: 2rem;
     transition: background-color 0.3s;
 }
 
 .crowd-bar div {
     text-align: center;
-    padding: 10px 0;
+    padding: 0.5rem 0;
     color: white;
-    font-weight: bold;
+    font-weight: 500;
     transition: width 0.5s ease;
 }
 
@@ -207,96 +219,85 @@ body.dark-mode .crowd-bar {
     background-color: #444;
 }
 
-body.dark-mode .optimal-crowd {
-    background-color: #388e3c;
-}
-
-body.dark-mode .minimal-crowd {
-    background-color: #ffa000;
-}
-
-body.dark-mode .maximal-crowd {
-    background-color: #c62828;
-}
-
-.facilities {
-    width: 48%;
-}
-
 .facilities h3 {
-    font-size: 1.3em;
-    margin-bottom: 10px;
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
 }
 
 .facilities-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
 }
 
 .facility {
-    font-size: 1.1em;
     background-color: #f0f2f5;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 1rem;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    transition: background-color 0.3s;
+    gap: 0.8rem;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.facility:hover {
+    transform: translateY(-2px);
 }
 
 .facility i {
-    margin-right: 10px;
     color: #004c99;
 }
 
 body.dark-mode .facility {
-    background-color: #333;
+    background-color: #2c2c2c;
 }
 
 body.dark-mode .facility i {
     color: #bb86fc;
 }
 
+/* Footer */
 footer {
     background-color: #004c99;
     color: white;
     text-align: center;
-    padding: 10px 0;
-    margin-top: 20px;
+    padding: 1rem 0;
+    margin-top: 2rem;
 }
 
 body.dark-mode footer {
     background-color: #1e1e1e;
 }
 
+/* Animation */
 .animation-container {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 150px;
+    height: 100px;
     overflow: hidden;
     z-index: -1;
 }
 
 .animated-shape {
-    width: 250px;
-    height: 250px;
-    background-color: rgba(0, 76, 153, 0.4);
+    width: 200px;
+    height: 200px;
+    background-color: rgba(0, 76, 153, 0.2);
     border-radius: 50%;
     position: absolute;
-    bottom: -125px;
+    bottom: -100px;
     left: -50px;
-    animation: moveShape 20s infinite linear;
+    animation: moveShape 15s infinite ease-in-out;
 }
 
 @keyframes moveShape {
     0% { transform: translateX(0) translateY(0); }
-    50% { transform: translateX(150%) translateY(-150%); }
+    50% { transform: translateX(120vw) translateY(-50px); }
     100% { transform: translateX(0) translateY(0); }
 }
 
-/* Modal Styles */
+/* Modal */
 .modal {
     display: none;
     position: fixed;
@@ -304,7 +305,7 @@ body.dark-mode footer {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     justify-content: center;
     align-items: center;
     z-index: 1000;
@@ -312,23 +313,22 @@ body.dark-mode footer {
 
 .modal-content {
     background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 300px;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
     text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     transition: background-color 0.3s;
 }
 
 body.dark-mode .modal-content {
     background-color: #2c2c2c;
-    color: #e0e0e0;
 }
 
 .modal-content h2 {
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
     color: #004c99;
-    transition: color 0.3s;
 }
 
 body.dark-mode .modal-content h2 {
@@ -337,16 +337,16 @@ body.dark-mode .modal-content h2 {
 
 .modal-content label {
     display: block;
-    margin: 10px 0;
-    font-weight: bold;
+    margin: 0.5rem 0;
+    font-weight: 500;
 }
 
-.modal-content input[type="text"], 
+.modal-content input[type="text"],
 .modal-content select {
-    width: 75%;
-    padding: 10px;
-    margin: 5px 0 15px;
-    border-radius: 4px;
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
     border: 1px solid #ccc;
     outline: none;
     transition: border-color 0.3s;
@@ -363,14 +363,15 @@ body.dark-mode .modal-content select {
     background-color: #004c99;
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
+    padding: 0.8rem 1.5rem;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 .modal-content button:hover {
     background-color: #003366;
+    transform: translateY(-2px);
 }
 
 body.dark-mode .modal-content button {
@@ -381,16 +382,58 @@ body.dark-mode .modal-content button:hover {
     background-color: #121212;
 }
 
-/* Toggle Button Styles */
+/* Toggle Button */
 .mode-toggle {
     background: none;
     border: none;
     color: white;
-    font-size: 1.5em;
+    font-size: 1.5rem;
     cursor: pointer;
     transition: color 0.3s;
 }
 
 body.dark-mode .mode-toggle {
     color: #bb86fc;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    header nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .search-container {
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    nav.options {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .station-info {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    header .logo h1 {
+        font-size: 1.5rem;
+    }
+
+    .arrival-info h2 {
+        font-size: 1.4rem;
+    }
+
+    .facility {
+        font-size: 0.9rem;
+    }
 }
