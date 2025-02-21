@@ -29,7 +29,6 @@
       height: 100%;
     }
 
-    /* Top Bar */
     .top-bar {
       position: absolute;
       top: 0;
@@ -62,7 +61,6 @@
       color: #5f6368;
     }
 
-    /* Info Panel */
     .info-panel {
       position: absolute;
       bottom: 70px;
@@ -87,7 +85,6 @@
       color: #1a73e8;
     }
 
-    /* Button Container */
     .button-container {
       position: absolute;
       bottom: 10px;
@@ -115,7 +112,6 @@
     #ar-btn { background: #ea4335; }
     #ar-btn:disabled { background: #dadce0; cursor: not-allowed; }
 
-    /* AR Container */
     #ar-container {
       position: fixed;
       bottom: 0;
@@ -139,7 +135,6 @@
       object-fit: cover;
     }
 
-    /* Routing Container */
     .leaflet-routing-container {
       background: #fff;
       border: none;
@@ -152,19 +147,6 @@
       z-index: 1000;
     }
 
-    .leaflet-routing-alternatives-container {
-      background: #f9f9f9;
-      padding: 8px;
-      border-radius: 8px;
-    }
-
-    .leaflet-routing-container h3 {
-      color: #1a73e8;
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-
-    /* Mobile Optimization */
     @media (max-width: 480px) {
       .top-bar { padding: 8px; }
       .top-bar input { padding: 10px; font-size: 14px; }
@@ -187,6 +169,7 @@
   <div class="info-panel" id="info-panel">
     <p>Distance: <span id="distance">--</span></p>
     <p>Time: <span id="time">--</span></p>
+    <p>ETA: <span id="eta">--</span></p>
     <p>Next Step: <span id="next-step">--</span></p>
   </div>
   <div class="button-container">
@@ -199,11 +182,11 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
   <script>
     // Initialize Map
     const map = L.map('map', { zoomControl: false }).setView([21.1522, 79.0888], 15);
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
       maxZoom: 19
     }).addTo(map);
@@ -216,6 +199,8 @@
     let arrowCanvas = document.getElementById('ar-canvas');
     let arrowContext = arrowCanvas.getContext('2d');
     let currentHeading = 0;
+    let routeCoordinates = [];
+    let instructions = [];
 
     // Hardcoded Nagpur Central Station Data
     const customLocations = {
@@ -257,7 +242,7 @@
       }
     }
 
-    // Watch User Location
+    // Watch User Location and Update Route
     function watchUserLocation() {
       if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
@@ -265,7 +250,10 @@
             const userLatLng = L.latLng(position.coords.latitude, position.coords.longitude);
             userMarker.setLatLng(userLatLng);
             map.panTo(userLatLng, { animate: true });
-            if (routingControl) updateRoute(userLatLng);
+            if (destinationLatLng && routingControl) {
+              updateRoute(userLatLng);
+              updateNavigationInfo(userLatLng);
+            }
           },
           () => console.error('Location watch failed'),
           { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
@@ -273,23 +261,49 @@
       }
     }
 
-    // Update Route
+    // Update Route with Recalculation
     function updateRoute(userLatLng) {
       if (routingControl) map.removeControl(routingControl);
       routingControl = L.Routing.control({
         waypoints: [userLatLng, destinationLatLng],
-        routeWhileDragging: true,
+        routeWhileDragging: false,
         lineOptions: { styles: [{ color: '#1a73e8', weight: 5 }] },
         show: true,
-        createMarker: () => null
+        createMarker: () => null,
+        router: L.Routing.osrmv1({
+          serviceUrl: 'https://router.project-osrm.org/route/v1'
+        })
       }).on('routesfound', (e) => {
         const routes = e.routes[0];
-        document.getElementById('distance').innerHTML = `${(routes.summary.totalDistance / 1000).toFixed(2)} km`;
-        document.getElementById('time').innerHTML = `${(routes.summary.totalTime / 60).toFixed(2)} mins`;
-        document.getElementById('next-step').innerHTML = routes.instructions[0]?.text || 'Follow the path';
+        routeCoordinates = routes.coordinates;
+        instructions = routes.instructions;
+        updateNavigationInfo(userLatLng);
         document.getElementById('info-panel').style.display = 'block';
         document.getElementById('ar-btn').disabled = false;
+      }).on('routingerror', (e) => {
+        console.error('Routing error:', e);
+        alert('Failed to calculate route. Retrying...');
+        updateRoute(userLatLng); // Retry on error
       }).addTo(map);
+    }
+
+    // Update Navigation Info
+    function updateNavigationInfo(userLatLng) {
+      if (!routeCoordinates.length) return;
+
+      const totalDistance = userLatLng.distanceTo(destinationLatLng) / 1000; // km
+      const totalTime = routingControl._routes[0].summary.totalTime / 60; // mins
+      const eta = new Date(Date.now() + totalTime * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const nextInstruction = instructions.find((instr) => {
+        const point = routeCoordinates[instr.index];
+        return L.latLng(point.lat, point.lng).distanceTo(userLatLng) > 5;
+      }) || { text: 'Arrived at destination' };
+
+      document.getElementById('distance').innerHTML = `${totalDistance.toFixed(2)} km`;
+      document.getElementById('time').innerHTML = `${totalTime.toFixed(1)} mins`;
+      document.getElementById('eta').innerHTML = eta;
+      document.getElementById('next-step').innerHTML = nextInstruction.text;
     }
 
     // Search Handler
@@ -338,9 +352,11 @@
       document.getElementById('ar-container').classList.remove('active');
       isARModeEnabled = false;
       if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
+      routeCoordinates = [];
+      instructions = [];
     });
 
-    // AR Navigation (Reverted to Your Previous Version)
+    // AR Navigation
     document.getElementById('ar-btn').addEventListener('click', () => {
       if (!isARModeEnabled) {
         isARModeEnabled = true;
@@ -350,8 +366,9 @@
       }
     });
 
+    // Start AR
+    let video = document.getElementById('video');
     function startAR() {
-      const video = document.getElementById('video');
       navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
         .then((stream) => {
           video.srcObject = stream;
@@ -360,7 +377,7 @@
             arrowCanvas.width = video.videoWidth;
             arrowCanvas.height = video.videoHeight;
             const updateFrame = () => {
-              updateAR(currentHeading);
+              if (isARModeEnabled) updateAR(currentHeading);
               requestAnimationFrame(updateFrame);
             };
             updateFrame();
@@ -368,7 +385,7 @@
         })
         .catch((err) => {
           console.error('Error accessing camera:', err);
-          alert('Camera access failed.');
+          alert('Camera access failed. Please allow camera permissions.');
           document.getElementById('ar-container').classList.remove('active');
           isARModeEnabled = false;
           document.getElementById('ar-btn').disabled = false;
@@ -377,11 +394,12 @@
       window.addEventListener('deviceorientation', (event) => {
         currentHeading = event.alpha || 0;
         if (destinationLatLng && isARModeEnabled) updateAR(currentHeading);
-      });
+      }, true);
     }
 
+    // Update AR
     function updateAR(compassHeading) {
-      if (!destinationLatLng) return;
+      if (!destinationLatLng || !userMarker) return;
       const userLatLng = userMarker.getLatLng();
       const destinationHeading = calculateHeading(userLatLng, destinationLatLng);
       const arrowRotation = (compassHeading - destinationHeading + 360) % 360;
@@ -390,15 +408,11 @@
       drawArrow(arrowContext, arrowCanvas.width / 2, arrowCanvas.height / 2, arrowRotation);
     }
 
+    // Draw Arrow
     function drawArrow(ctx, x, y, rotation) {
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(rotation * Math.PI / 180);
-
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-      ctx.shadowBlur = 10;
-      ctx.shadowOffsetX = 12;
-      ctx.shadowOffsetY = 8;
 
       ctx.beginPath();
       ctx.moveTo(-20, -70);
@@ -420,6 +434,7 @@
       ctx.restore();
     }
 
+    // Calculate Heading
     function calculateHeading(from, to) {
       const lat1 = from.lat * Math.PI / 180;
       const lat2 = to.lat * Math.PI / 180;
@@ -430,7 +445,7 @@
       return (heading + 360) % 360;
     }
 
-    // Voice Search (Placeholder)
+    // Voice Search
     document.getElementById('voice-search-btn').addEventListener('click', () => {
       if ('webkitSpeechRecognition' in window) {
         const recognition = new webkitSpeechRecognition();
@@ -439,6 +454,7 @@
           document.getElementById('search').value = event.results[0][0].transcript;
           document.getElementById('search').dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter' }));
         };
+        recognition.onerror = () => alert('Voice recognition failed.');
         recognition.start();
       } else {
         alert('Voice search not supported.');
