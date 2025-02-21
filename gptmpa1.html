@@ -56,8 +56,16 @@
       background: #000; z-index: 2000; overflow: hidden; transition: height 0.3s ease;
     }
     #ar-container.active { height: 50vh; }
-    #ar-container video,
-    #ar-container canvas { width: 100%; height: 100%; object-fit: cover; }
+    #ar-container video {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    /* Place canvas on top of video */
+    #ar-container canvas {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
 
     /* Leaflet Routing Machine */
     .leaflet-routing-container {
@@ -120,7 +128,7 @@
     let currentHeading = 0;
     let routeCoordinates = [];
     let instructions = [];
-    let deviceOrientationListenerAdded = false; // Guard for deviceorientation
+    let deviceOrientationListenerAdded = false; // Prevent multiple listeners
 
     // Hardcoded Nagpur Central Station Data
     const customLocations = {
@@ -154,7 +162,7 @@
               userMarker.setLatLng(userLatLng);
             }
             map.panTo(userLatLng, { animate: true });
-            callback(userLatLng);
+            if (callback) callback(userLatLng);
           },
           () => alert('Unable to retrieve your location.'),
           { enableHighAccuracy: true }
@@ -171,8 +179,8 @@
             const userLatLng = L.latLng(position.coords.latitude, position.coords.longitude);
             if (userMarker) userMarker.setLatLng(userLatLng);
             map.panTo(userLatLng, { animate: true });
+            // Only update navigation info (not recalculating the route continuously)
             if (destinationLatLng && routingControl) {
-              updateRoute(userLatLng);
               updateNavigationInfo(userLatLng);
             }
           },
@@ -216,8 +224,8 @@
 
     function updateNavigationInfo(userLatLng) {
       if (!routeCoordinates.length || !routingControl._routes?.[0]?.summary) return;
-      const totalDistance = userLatLng.distanceTo(destinationLatLng) / 1000; // in km
-      const totalTime = routingControl._routes[0].summary.totalTime / 60; // in mins
+      const totalDistance = userLatLng.distanceTo(destinationLatLng) / 1000; // km
+      const totalTime = routingControl._routes[0].summary.totalTime / 60; // mins
       const eta = new Date(Date.now() + totalTime * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const nextInstruction = instructions.find(instr => {
         const point = routeCoordinates[instr.index];
@@ -231,29 +239,34 @@
     }
 
     /*********************
-     * SEARCH & VOICE
+     * SEARCH & VOICE HANDLING
      *********************/
+    // Helper to process search queries
+    function processSearch(query) {
+      query = query.toLowerCase().trim();
+      if (customLocations[query]) {
+        destinationLatLng = L.latLng(customLocations[query].lat, customLocations[query].lng);
+        L.marker(destinationLatLng).addTo(map).bindPopup(query).openPopup();
+        getUserLocation((userLatLng) => updateRoute(userLatLng));
+      } else {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.length) {
+              destinationLatLng = L.latLng(parseFloat(data[0].lat), parseFloat(data[0].lon));
+              L.marker(destinationLatLng).addTo(map).bindPopup(query).openPopup();
+              getUserLocation((userLatLng) => updateRoute(userLatLng));
+            } else {
+              alert('Location not found!');
+            }
+          })
+          .catch(err => console.error('Search error:', err));
+      }
+    }
+
     document.getElementById('search').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
-        const query = e.target.value.toLowerCase().trim();
-        if (customLocations[query]) {
-          destinationLatLng = L.latLng(customLocations[query].lat, customLocations[query].lng);
-          L.marker(destinationLatLng).addTo(map).bindPopup(query).openPopup();
-          getUserLocation((userLatLng) => updateRoute(userLatLng));
-        } else {
-          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`)
-            .then(res => res.json())
-            .then(data => {
-              if (data.length) {
-                destinationLatLng = L.latLng(parseFloat(data[0].lat), parseFloat(data[0].lon));
-                L.marker(destinationLatLng).addTo(map).bindPopup(query).openPopup();
-                getUserLocation((userLatLng) => updateRoute(userLatLng));
-              } else {
-                alert('Location not found!');
-              }
-            })
-            .catch(err => console.error('Search error:', err));
-        }
+        processSearch(e.target.value);
       }
     });
 
@@ -263,10 +276,9 @@
         const recognition = new SpeechRecognition();
         recognition.lang = 'en-US';
         recognition.onresult = (event) => {
-          document.getElementById('search').value = event.results[0][0].transcript;
-          // Simulate Enter keypress to trigger search
-          const enterEvent = new KeyboardEvent('keypress', { key: 'Enter' });
-          document.getElementById('search').dispatchEvent(enterEvent);
+          const transcript = event.results[0][0].transcript;
+          document.getElementById('search').value = transcript;
+          processSearch(transcript);
         };
         recognition.onerror = () => alert('Voice recognition failed.');
         recognition.start();
@@ -296,7 +308,7 @@
       document.getElementById('back-btn').style.display = 'none';
       document.getElementById('ar-container').classList.remove('active');
       isARModeEnabled = false;
-      // Stop AR video tracks if any
+      // Stop AR video tracks
       const videoElem = document.getElementById('video');
       if (videoElem.srcObject) {
         videoElem.srcObject.getTracks().forEach(track => track.stop());
@@ -326,7 +338,6 @@
           video.addEventListener('loadeddata', () => {
             arrowCanvas.width = video.videoWidth;
             arrowCanvas.height = video.videoHeight;
-            // Begin AR update loop
             const updateFrame = () => {
               if (isARModeEnabled) updateAR(currentHeading);
               requestAnimationFrame(updateFrame);
@@ -342,7 +353,7 @@
           document.getElementById('ar-btn').disabled = false;
         });
 
-      // Add device orientation listener once
+      // Add device orientation listener only once
       if (!deviceOrientationListenerAdded) {
         window.addEventListener('deviceorientation', (event) => {
           currentHeading = event.alpha || 0;
