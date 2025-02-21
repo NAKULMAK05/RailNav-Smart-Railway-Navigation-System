@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Railway Navigation Dashboard</title>
+    <link rel="stylesheet" href="style1.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <h1>Railway Navigation</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="search-container">
+            <input type="text" placeholder="Search station or facility..." />
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </div>
+        <button id="modeToggle" class="mode-toggle"><i class="fas fa-sun"></i></button>
+        <div class="toggle-btn">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+
+        <div class="dropdown-menu">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+        </div>
+    </header>
+
+    <div class="mob-search-container">
+        <input type="text" placeholder="Search for a place" />
+        <button>🔍</button>
+    </div>
+
+    <nav class="options">
+        <button id="startNavigation"><i class="fas fa-map-signs"></i> Start Navigation</button>
+        <button id="setAlarm"><i class="fas fa-bell"></i> Set Alarm</button>
+    </nav>
+
+    <main>
+        <section class="station-info">
+            <div class="info-container">
+                <div class="arrival-info">
+                    <h2>Next Station: <span id="nextStation">Central Station</span></h2>
+                    <h2>Arriving In: <span id="arrivalTime">--</span></h2>
+                </div>
+                <div class="crowd-density">
+                    <h3>Crowd Density</h3>
+                    <div class="crowd-bar">
+                        <div class="optimal-crowd" style="width: 30%;">Optimal</div>
+                        <div class="minimal-crowd" style="width: 20%;">Minimal</div>
+                        <div class="maximal-crowd" style="width: 50%;">Maximal</div>
+                    </div>
+                    <p id="currentCrowd">Current Density: Medium</p>
+                </div>
+            </div>
+
+            <div class="facilities">
+                <h3>Facilities Available at Approaching Station:</h3>
+                <div class="facilities-grid">
+                    <div class="facility"><i class="fas fa-restroom"></i> Restroom</div>
+                    <div class="facility"><i class="fas fa-utensils"></i> Food Court</div>
+                    <div class="facility"><i class="fas fa-coffee"></i> Coffee Store</div>
+                    <div class="facility"><i class="fas fa-money-bill-wave"></i> ATM</div>
+                    <div class="facility"><i class="fas fa-chair"></i> Waiting Area</div>
+                    <div class="facility"><i class="fas fa-wheelchair"></i> Wheelchair Accessible</div>
+                    <div class="facility"><i class="fas fa-train"></i> Platform Information</div>
+                    <div class="facility"><i class="fas fa-map-marked-alt"></i> Station Map</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Enhanced Railway Navigation. All rights reserved.</p>
+    </footer>
+
+    <div class="animation-container">
+        <div class="animated-shape"></div>
+    </div>
+
+    <div id="alarmModal" class="modal">
+        <div class="modal-content">
+            <h2>Set Alarm</h2>
+            <label for="stationName">Destination Station:</label>
+            <input type="text" id="stationName" placeholder="Enter destination station">
+            <label for="alarmSound">Choose Alarm Sound:</label>
+            <select id="alarmSound">
+                <option value="sound1">Sound 1</option>
+                <option value="sound2">Sound 2</option>
+                <option value="sound3">Sound 3</option>
+            </select>
+            <button id="confirmAlarm">Set Alarm</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('startNavigation').addEventListener('click', function () {
+            window.location.href = 'gptmpa.html';
+        });
+
+        document.getElementById('setAlarm').addEventListener('click', function () {
+            document.getElementById('alarmModal').style.display = 'flex';
+        });
+
+        document.getElementById('confirmAlarm').addEventListener('click', function () {
+            document.getElementById('alarmModal').style.display = 'none';
+            // Set the alarm logic here
+            alert('Alarm set for your destination!');
+        });
+
+        // Toggle light/dark mode
+        const modeToggle = document.getElementById('modeToggle');
+        modeToggle.addEventListener('click', function () {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            modeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+
+        async function updateArrivalTime() {
+            try {
+                const location = await getCurrentLocation();
+                const userCoords = {
+                    lat: location.coords.latitude,
+                    lng: location.coords.longitude
+                };
+
+                // Replace with your next station coordinates
+                const nextStationCoords = {
+                    lat: 21.145800,
+                    lng: 79.088158
+                };
+
+                const duration = await calculateRoute(userCoords, nextStationCoords);
+                const arrivalTime = new Date(Date.now() + duration * 1000).toLocaleTimeString();
+
+                document.getElementById('arrivalTime').innerText = arrivalTime;
+                document.getElementById('nextStation').innerText = 'Central Station'; // Update with the actual next station name
+
+                setTimeout(updateArrivalTime, 60000); // Update every minute
+            } catch (error) {
+                console.error('Error updating arrival time:', error);
+            }
+        }
+
+        updateArrivalTime();
+
+        const toggleBtn = document.querySelector('.toggle-btn');
+        const toggleBtnIcon = document.querySelector('.toggle-btn i');
+        const dropDownMenu = document.querySelector('.dropdown-menu');
+
+        toggleBtn.onclick = function () {
+            dropDownMenu.classList.toggle('open')
+            const isOpen = dropDownMenu.classList.contains('open')
+
+            toggleBtnIcon.classList = isOpen
+                ? 'fa-solid fa-xmark'
+                : 'fa-solid fa-bars'
+        }
+    </script>
+</body>
+
+</html>
