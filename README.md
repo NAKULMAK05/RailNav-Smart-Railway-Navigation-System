@@ -80,7 +80,7 @@ This project is purposed for public having problems while travelling on railway 
 <br/>
 This project was Made purely by ourselves , <br/>
 
-**Nakul Makode** and **Ansh Choube** and **Yogeshwar Tiwari**.
+**Nakul Makode** and **Ansh Choube** and **Yogeshwar Tiwari**.and **Ayush Lochan**
 <br/>
 <br/>
 
