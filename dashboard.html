@@ -1,620 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Enhanced Railway Navigation Dashboard</title>
-  <!-- External Fonts and Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <style>
-    /* General Styles */
-    body {
-      font-family: 'Roboto', sans-serif;
-      background-color: #f7f9fc;
-      color: #333;
-      margin: 0;
-      padding: 0;
-      line-height: 1.6;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    body.dark-mode {
-      background-color: #121212;
-      color: #e0e0e0;
-    }
-    
-    /* Header */
-    header {
-      background-color: #004c99;
-      color: white;
-      padding: 1rem 2rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-    header .logo h1 {
-      font-size: 1.8rem;
-      font-weight: 600;
-      margin: 0;
-    }
-    header nav ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      gap: 1.5rem;
-    }
-    header nav ul li a {
-      color: white;
-      text-decoration: none;
-      font-size: 1.1rem;
-      font-weight: 500;
-      transition: color 0.3s ease;
-    }
-    header nav ul li a:hover {
-      color: #b3d4ff;
-    }
-    .search-container {
-      display: flex;
-      align-items: center;
-      margin-top: 1rem;
-      flex-grow: 1;
-      max-width: 400px;
-    }
-    .search-container input[type="text"] {
-      padding: 0.6rem 1rem;
-      border-radius: 20px 0 0 20px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      width: 100%;
-      outline: none;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    .search-container input[type="text"]:focus {
-      border-color: #004c99;
-      box-shadow: 0 0 5px rgba(0, 76, 153, 0.5);
-    }
-    body.dark-mode .search-container input[type="text"] {
-      border-color: #666;
-      background-color: #2c2c2c;
-      color: #e0e0e0;
-    }
-    .search-container button {
-      background-color: #004c99;
-      border: none;
-      border-radius: 0 20px 20px 0;
-      padding: 0.6rem 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    .search-container button i {
-      color: white;
-    }
-    .search-container button:hover {
-      background-color: #003366;
-    }
-    body.dark-mode .search-container button {
-      background-color: #555;
-    }
-    body.dark-mode .search-container button:hover {
-      background-color: #444;
-    }
-    
-    /* Mode Toggle Button */
-    .mode-toggle {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-      transition: color 0.3s;
-    }
-    body.dark-mode .mode-toggle {
-      color: #bb86fc;
-    }
-    
-    /* Options Navigation */
-    nav.options {
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      margin: 2rem 1rem;
-      flex-wrap: wrap;
-    }
-    nav.options button {
-      background-color: #004c99;
-      color: white;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      font-size: 1rem;
-      cursor: pointer;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: background-color 0.3s ease, transform 0.2s;
-    }
-    nav.options button:hover {
-      background-color: #003366;
-      transform: translateY(-2px);
-    }
-    body.dark-mode nav.options button {
-      background-color: #1e1e1e;
-    }
-    body.dark-mode nav.options button:hover {
-      background-color: #121212;
-    }
-    
-    /* Main Content */
-    main {
-      width: 90%;
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 2rem;
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      transition: background-color 0.3s, box-shadow 0.3s;
-    }
-    body.dark-mode main {
-      background-color: #1e1e1e;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-    
-    .station-info {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2rem;
-    }
-    .info-container, .facilities {
-      flex: 1;
-      min-width: 300px;
-    }
-    .arrival-info h2 {
-      font-size: 1.6rem;
-      margin-bottom: 0.8rem;
-      color: #004c99;
-      transition: color 0.3s;
-    }
-    body.dark-mode .arrival-info h2 {
-      color: #bb86fc;
-    }
-    .crowd-density h3 {
-      font-size: 1.3rem;
-      margin-bottom: 0.8rem;
-    }
-    .crowd-bar {
-      display: flex;
-      background-color: #e0e0e0;
-      border-radius: 8px;
-      overflow: hidden;
-      height: 2rem;
-      transition: background-color 0.3s;
-    }
-    .crowd-bar div {
-      text-align: center;
-      padding: 0.5rem 0;
-      color: white;
-      font-weight: 500;
-      transition: width 0.5s ease;
-    }
-    .optimal-crowd {
-      background-color: #4CAF50;
-      width: 30%;
-    }
-    .minimal-crowd {
-      background-color: #FFC107;
-      width: 20%;
-    }
-    .maximal-crowd {
-      background-color: #F44336;
-      width: 50%;
-    }
-    body.dark-mode .crowd-bar {
-      background-color: #444;
-    }
-    .facilities h3 {
-      font-size: 1.3rem;
-      margin-bottom: 0.8rem;
-    }
-    .facilities-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-    }
-    .facility {
-      background-color: #f0f2f5;
-      padding: 1rem;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      transition: background-color 0.3s, transform 0.2s;
-    }
-    .facility:hover {
-      transform: translateY(-2px);
-    }
-    .facility i {
-      color: #004c99;
-    }
-    body.dark-mode .facility {
-      background-color: #2c2c2c;
-    }
-    body.dark-mode .facility i {
-      color: #bb86fc;
-    }
-    
-    /* Footer */
-    footer {
-      background-color: #004c99;
-      color: white;
-      text-align: center;
-      padding: 1rem 0;
-      margin-top: 2rem;
-    }
-    body.dark-mode footer {
-      background-color: #1e1e1e;
-    }
-    
-    /* Animation */
-    .animation-container {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 100px;
-      overflow: hidden;
-      z-index: -1;
-    }
-    .animated-shape {
-      width: 200px;
-      height: 200px;
-      background-color: rgba(0, 76, 153, 0.2);
-      border-radius: 50%;
-      position: absolute;
-      bottom: -100px;
-      left: -50px;
-      animation: moveShape 15s infinite ease-in-out;
-    }
-    @keyframes moveShape {
-      0% { transform: translateX(0) translateY(0); }
-      50% { transform: translateX(120vw) translateY(-50px); }
-      100% { transform: translateX(0) translateY(0); }
-    }
-    
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1500;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.6);
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background-color: white;
-      padding: 2rem;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      transition: background-color 0.3s;
-    }
-    body.dark-mode .modal-content {
-      background-color: #2c2c2c;
-    }
-    .modal-content h2 {
-      margin-bottom: 1.5rem;
-      color: #004c99;
-    }
-    body.dark-mode .modal-content h2 {
-      color: #bb86fc;
-    }
-    .modal-content label {
-      display: block;
-      margin: 0.5rem 0;
-      font-weight: 500;
-    }
-    .modal-content input[type="text"],
-    .modal-content select {
-      width: 100%;
-      padding: 0.8rem;
-      margin-bottom: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-    body.dark-mode .modal-content input[type="text"],
-    body.dark-mode .modal-content select {
-      background-color: #444;
-      border-color: #666;
-      color: #e0e0e0;
-    }
-    .modal-content button {
-      background-color: #004c99;
-      color: white;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s, transform 0.2s;
-    }
-    .modal-content button:hover {
-      background-color: #003366;
-      transform: translateY(-2px);
-    }
-    body.dark-mode .modal-content button {
-      background-color: #1e1e1e;
-    }
-    body.dark-mode .modal-content button:hover {
-      background-color: #121212;
-    }
-    
-    /* Media Queries */
-    @media (max-width: 768px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      header nav ul {
-        flex-direction: column;
-        gap: 0.5rem;
-        margin-top: 1rem;
-      }
-      .search-container {
-        width: 100%;
-        margin-top: 1rem;
-      }
-      nav.options {
-        flex-direction: column;
-        gap: 1rem;
-      }
-      .station-info {
-        flex-direction: column;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      header .logo h1 {
-        font-size: 1.5rem;
-      }
-      .arrival-info h2 {
-        font-size: 1.4rem;
-      }
-      .facility {
-        font-size: 0.9rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Railway Navigation Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <h1>Railway Navigation</h1>
-    </div>
-    <nav>
-      <ul>
-        <li><a href="#">Home</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Contact</a></li>
-      </ul>
+    <header>
+        <div class="logo">
+            <h1>Railway Navigation</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="search-container">
+            <input type="text" placeholder="Search station or facility..." />
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </div>
+        <button id="modeToggle" class="mode-toggle"><i class="fas fa-sun"></i></button>
+    </header>
+
+    <nav class="options">
+        <button id="startNavigation"><i class="fas fa-map-signs"></i> Start Navigation</button>
+        <button id="setAlarm"><i class="fas fa-bell"></i> Set Alarm</button>
     </nav>
-    <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Search station or facility..." />
-      <button id="searchBtn" type="submit"><i class="fas fa-search"></i></button>
+
+    <main>
+        <section class="station-info">
+            <div class="info-container">
+                <div class="arrival-info">
+                    <h2>Next Station: <span id="nextStation">Central Station</span></h2>
+                    <h2>Arriving In: <span id="arrivalTime">--</span></h2>
+                </div>
+                <div class="crowd-density">
+                    <h3>Crowd Density</h3>
+                    <div class="crowd-bar">
+                        <div class="optimal-crowd" style="width: 30%;">Optimal</div>
+                        <div class="minimal-crowd" style="width: 20%;">Minimal</div>
+                        <div class="maximal-crowd" style="width: 50%;">Maximal</div>
+                    </div>
+                    <p id="currentCrowd">Current Density: Medium</p>
+                </div>
+            </div>
+
+            <div class="facilities">
+                <h3>Facilities Available at Approaching Station:</h3>
+                <div class="facilities-grid">
+                    <div class="facility"><i class="fas fa-restroom"></i> Restroom</div>
+                    <div class="facility"><i class="fas fa-utensils"></i> Food Court</div>
+                    <div class="facility"><i class="fas fa-coffee"></i> Coffee Store</div>
+                    <div class="facility"><i class="fas fa-money-bill-wave"></i> ATM</div>
+                    <div class="facility"><i class="fas fa-chair"></i> Waiting Area</div>
+                    <div class="facility"><i class="fas fa-wheelchair"></i> Wheelchair Accessible</div>
+                    <div class="facility"><i class="fas fa-train"></i> Platform Information</div>
+                    <div class="facility"><i class="fas fa-map-marked-alt"></i> Station Map</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Enhanced Railway Navigation. All rights reserved.</p>
+    </footer>
+
+    <div class="animation-container">
+        <div class="animated-shape"></div>
     </div>
-    <button id="modeToggle" class="mode-toggle"><i class="fas fa-sun"></i></button>
-  </header>
 
-  <nav class="options">
-    <button id="startNavigation"><i class="fas fa-map-signs"></i> Start Navigation</button>
-    <button id="setAlarm"><i class="fas fa-bell"></i> Set Alarm</button>
-  </nav>
-
-  <main>
-    <section class="station-info">
-      <div class="info-container">
-        <div class="arrival-info">
-          <h2>Next Station: <span id="nextStation">--</span></h2>
-          <h2>Arriving In: <span id="arrivalTime">--</span></h2>
+    <div id="alarmModal" class="modal">
+        <div class="modal-content">
+            <h2>Set Alarm</h2>
+            <label for="stationName">Destination Station:</label>
+            <input type="text" id="stationName" placeholder="Enter destination station">
+            <label for="alarmSound">Choose Alarm Sound:</label>
+            <select id="alarmSound">
+                <option value="sound1">Sound 1</option>
+                <option value="sound2">Sound 2</option>
+                <option value="sound3">Sound 3</option>
+                <option value="sound3">Sound 4</option>
+            </select>
+            <button id="confirmAlarm">Set Alarm</button>
         </div>
-        <div class="crowd-density">
-          <h3>Crowd Density</h3>
-          <div class="crowd-bar">
-            <div class="optimal-crowd"></div>
-            <div class="minimal-crowd"></div>
-            <div class="maximal-crowd"></div>
-          </div>
-          <p id="currentCrowd">Current Density: --</p>
-        </div>
-      </div>
-
-      <div class="facilities">
-        <h3>Facilities Available at Approaching Station:</h3>
-        <div class="facilities-grid" id="facilitiesGrid">
-          <!-- Facility cards will be injected here -->
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <p>&copy; 2024 Enhanced Railway Navigation. All rights reserved.</p>
-  </footer>
-
-  <div class="animation-container">
-    <div class="animated-shape"></div>
-  </div>
-
-  <div id="alarmModal" class="modal">
-    <div class="modal-content">
-      <h2>Set Alarm</h2>
-      <label for="stationName">Destination Station:</label>
-      <input type="text" id="stationName" placeholder="Enter destination station" />
-      <label for="alarmSound">Choose Alarm Sound:</label>
-      <select id="alarmSound">
-        <option value="sound1">Sound 1</option>
-        <option value="sound2">Sound 2</option>
-        <option value="sound3">Sound 3</option>
-        <option value="sound4">Sound 4</option>
-      </select>
-      <button id="confirmAlarm">Set Alarm</button>
     </div>
-  </div>
 
-  <script>
-    /*********************
-     * API INTEGRATION USING RAPIDAPI's IRCTC API
-     *********************/
-    // Replace with your actual RapidAPI IRCTC API key
-    const API_KEY = "54f6a650femsh08d4deda83b40e4p1d0c49jsn0b3473d10b1d"; 
-    // Example endpoint URL – adjust as per the API documentation
-    const RAPIDAPI_IRCTC_ENDPOINT = "https://irctc1.p.rapidapi.com/station/info";
-
-    async function fetchStationInfo(stationName) {
-      try {
-        const response = await fetch(`${RAPIDAPI_IRCTC_ENDPOINT}?station=${encodeURIComponent(stationName)}`, {
-          method: "GET",
-          headers: {
-            "x-rapidapi-host": "irctc1.p.rapidapi.com",
-            "x-rapidapi-key": API_KEY
-          }
+    <script>
+        document.getElementById('startNavigation').addEventListener('click', function() {
+            window.location.href = 'gptmpa.html';
         });
-        const result = await response.json();
-        // Assume API returns an object in result.data
-        return result.data;
-      } catch (error) {
-        console.error("Error fetching station info:", error);
-        return null;
-      }
-    }
 
-    async function updateDashboard(stationName) {
-      const stationData = await fetchStationInfo(stationName);
-      if (stationData) {
-        document.getElementById("nextStation").innerText = stationData.name || "--";
-        if (stationData.nextTrain && stationData.nextTrain.arrivalTime) {
-          const arrivalTime = new Date(stationData.nextTrain.arrivalTime);
-          document.getElementById("arrivalTime").innerText = arrivalTime.toLocaleTimeString();
-        } else {
-          document.getElementById("arrivalTime").innerText = "--";
+        document.getElementById('setAlarm').addEventListener('click', function() {
+            document.getElementById('alarmModal').style.display = 'flex';
+        });
+
+        document.getElementById('confirmAlarm').addEventListener('click', function() {
+            document.getElementById('alarmModal').style.display = 'none';
+            // Set the alarm logic here
+            alert('Alarm set for your destination!');
+        });
+
+        // Toggle light/dark mode
+        const modeToggle = document.getElementById('modeToggle');
+        modeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            modeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+
+        async function updateArrivalTime() {
+            try {
+                const location = await getCurrentLocation();
+                const userCoords = {
+                    lat: location.coords.latitude,
+                    lng: location.coords.longitude
+                };
+
+                // Replace with your next station coordinates
+                const nextStationCoords = {
+                    lat: 21.145800,
+                    lng: 79.088158
+                };
+
+                const duration = await calculateRoute(userCoords, nextStationCoords);
+                const arrivalTime = new Date(Date.now() + duration * 1000).toLocaleTimeString();
+
+                document.getElementById('arrivalTime').innerText = arrivalTime;
+                document.getElementById('nextStation').innerText = 'Central Station'; // Update with the actual next station name
+
+                setTimeout(updateArrivalTime, 60000); // Update every minute
+            } catch (error) {
+                console.error('Error updating arrival time:', error);
+            }
         }
-        document.getElementById("currentCrowd").innerText = "Current Density: " + (stationData.crowdDensity || "--");
-        populateFacilities(stationData.facilities);
-      } else {
-        alert("Station data not available.");
-      }
-    }
 
-    function populateFacilities(facilities) {
-      const grid = document.getElementById("facilitiesGrid");
-      grid.innerHTML = "";
-      if (facilities && facilities.length) {
-        facilities.forEach(facility => {
-          const div = document.createElement("div");
-          div.className = "facility";
-          div.innerHTML = `<i class="fas ${getFacilityIcon(facility.type)}"></i> ${facility.type}`;
-          grid.appendChild(div);
-        });
-      } else {
-        grid.innerHTML = "<p>No facility data available.</p>";
-      }
-    }
-
-    function getFacilityIcon(type) {
-      switch (type.toLowerCase()) {
-        case "restroom": return "fa-restroom";
-        case "food court": return "fa-utensils";
-        case "coffee store": return "fa-coffee";
-        case "atm": return "fa-money-bill-wave";
-        case "waiting area": return "fa-chair";
-        case "wheelchair accessible": return "fa-wheelchair";
-        case "platform information": return "fa-train";
-        case "station map": return "fa-map-marked-alt";
-        default: return "fa-info-circle";
-      }
-    }
-
-    /*********************
-     * EVENT HANDLERS
-     *********************/
-    document.getElementById("searchBtn").addEventListener("click", () => {
-      const query = document.getElementById("searchInput").value;
-      if (query) {
-        updateDashboard(query);
-      }
-    });
-
-    // Allow Enter key to trigger search
-    document.getElementById("searchInput").addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        const query = e.target.value;
-        if (query) updateDashboard(query);
-      }
-    });
-
-    // Voice search using the Web Speech API
-    document.getElementById("voice-search-btn").addEventListener("click", () => {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        recognition.lang = "en-US";
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
-        recognition.onresult = (event) => {
-          const transcript = event.results[0][0].transcript;
-          document.getElementById("searchInput").value = transcript;
-          updateDashboard(transcript);
-        };
-        recognition.onerror = (event) => {
-          console.error("Voice recognition error:", event.error);
-          alert("Voice recognition failed. Please try again.");
-        };
-        recognition.start();
-      } else {
-        alert("Voice search not supported.");
-      }
-    });
-
-    // Navigation and Alarm (stubbed functionality)
-    document.getElementById("startNavigation").addEventListener("click", () => {
-      const stationName = document.getElementById("searchInput").value || "Central Station";
-      updateDashboard(stationName);
-      alert("Navigation started for " + stationName);
-    });
-
-    document.getElementById("setAlarm").addEventListener("click", () => {
-      document.getElementById("alarmModal").style.display = "flex";
-    });
-
-    document.getElementById("confirmAlarm").addEventListener("click", () => {
-      document.getElementById("alarmModal").style.display = "none";
-      // Alarm scheduling logic goes here
-      alert("Alarm set for your destination!");
-    });
-
-    document.getElementById("modeToggle").addEventListener("click", () => {
-      document.body.classList.toggle("dark-mode");
-      const isDarkMode = document.body.classList.contains("dark-mode");
-      document.getElementById("modeToggle").innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    });
-
-    // Auto-update dashboard every minute for live data
-    setInterval(() => {
-      const stationName = document.getElementById("searchInput").value || "Central Station";
-      updateDashboard(stationName);
-    }, 60000);
-
-    // Initialize with a default station
-    updateDashboard("Central Station");
-  </script>
+        updateArrivalTime();
+    </script>
 </body>
 </html>
