@@ -152,6 +152,18 @@
       z-index: 1000;
     }
 
+    .leaflet-routing-alternatives-container {
+      background: #f9f9f9;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .leaflet-routing-container h3 {
+      color: #1a73e8;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
     /* Mobile Optimization */
     @media (max-width: 480px) {
       .top-bar { padding: 8px; }
@@ -175,7 +187,6 @@
   <div class="info-panel" id="info-panel">
     <p>Distance: <span id="distance">--</span></p>
     <p>Time: <span id="time">--</span></p>
-    <p>ETA: <span id="eta">--</span></p>
     <p>Next Step: <span id="next-step">--</span></p>
   </div>
   <div class="button-container">
@@ -205,8 +216,6 @@
     let arrowCanvas = document.getElementById('ar-canvas');
     let arrowContext = arrowCanvas.getContext('2d');
     let currentHeading = 0;
-    let routeCoordinates = [];
-    let instructions = [];
 
     // Hardcoded Nagpur Central Station Data
     const customLocations = {
@@ -248,7 +257,7 @@
       }
     }
 
-    // Watch User Location and Update Route
+    // Watch User Location
     function watchUserLocation() {
       if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
@@ -256,10 +265,7 @@
             const userLatLng = L.latLng(position.coords.latitude, position.coords.longitude);
             userMarker.setLatLng(userLatLng);
             map.panTo(userLatLng, { animate: true });
-            if (destinationLatLng) {
-              updateRoute(userLatLng);
-              updateNavigationInfo(userLatLng);
-            }
+            if (routingControl) updateRoute(userLatLng);
           },
           () => console.error('Location watch failed'),
           { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
@@ -267,7 +273,7 @@
       }
     }
 
-    // Update Route with Recalculation
+    // Update Route
     function updateRoute(userLatLng) {
       if (routingControl) map.removeControl(routingControl);
       routingControl = L.Routing.control({
@@ -275,46 +281,15 @@
         routeWhileDragging: true,
         lineOptions: { styles: [{ color: '#1a73e8', weight: 5 }] },
         show: true,
-        createMarker: () => null,
-        router: L.Routing.osrmv1({
-          serviceUrl: 'https://router.project-osrm.org/route/v1'
-        })
+        createMarker: () => null
       }).on('routesfound', (e) => {
         const routes = e.routes[0];
-        routeCoordinates = routes.coordinates;
-        instructions = routes.instructions;
-        updateNavigationInfo(userLatLng);
+        document.getElementById('distance').innerHTML = `${(routes.summary.totalDistance / 1000).toFixed(2)} km`;
+        document.getElementById('time').innerHTML = `${(routes.summary.totalTime / 60).toFixed(2)} mins`;
+        document.getElementById('next-step').innerHTML = routes.instructions[0]?.text || 'Follow the path';
         document.getElementById('info-panel').style.display = 'block';
         document.getElementById('ar-btn').disabled = false;
-      }).on('routingerror', () => {
-        updateRoute(userLatLng); // Recalculate on deviation
       }).addTo(map);
-    }
-
-    // Update Navigation Info (Distance, Time, ETA, Next Step)
-    function updateNavigationInfo(userLatLng) {
-      if (!routeCoordinates.length) return;
-
-      const totalDistance = userLatLng.distanceTo(destinationLatLng) / 1000; // km
-      const totalTime = routingControl._routes[0].summary.totalTime / 60; // mins
-      const eta = new Date(Date.now() + totalTime * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      const nextInstruction = instructions.find((instr) => {
-        const point = routeCoordinates[instr.index];
-        return L.latLng(point.lat, point.lng).distanceTo(userLatLng) > 5;
-      }) || { text: 'Arrived at destination' };
-
-      document.getElementById('distance').innerHTML = `${totalDistance.toFixed(2)} km`;
-      document.getElementById('time').innerHTML = `${totalTime.toFixed(1)} mins`;
-      document.getElementById('eta').innerHTML = eta;
-      document.getElementById('next-step').innerHTML = nextInstruction.text;
-
-      // Placeholder for Voice Guidance
-      // if ('speechSynthesis' in window) {
-      //   const utterance = new SpeechSynthesisUtterance(nextInstruction.text);
-      //   utterance.lang = 'en-US';
-      //   speechSynthesis.speak(utterance);
-      // }
     }
 
     // Search Handler
@@ -339,10 +314,6 @@
             })
             .catch((err) => console.error('Search error:', err));
         }
-        // Placeholder for Search Autocomplete
-        // fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=5`)
-        //   .then(res => res.json())
-        //   .then(data => console.log('Autocomplete suggestions:', data));
       }
     });
 
@@ -367,11 +338,9 @@
       document.getElementById('ar-container').classList.remove('active');
       isARModeEnabled = false;
       if (video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
-      routeCoordinates = [];
-      instructions = [];
     });
 
-    // AR Navigation
+    // AR Navigation (Reverted to Your Previous Version)
     document.getElementById('ar-btn').addEventListener('click', () => {
       if (!isARModeEnabled) {
         isARModeEnabled = true;
@@ -461,7 +430,7 @@
       return (heading + 360) % 360;
     }
 
-    // Voice Search
+    // Voice Search (Placeholder)
     document.getElementById('voice-search-btn').addEventListener('click', () => {
       if ('webkitSpeechRecognition' in window) {
         const recognition = new webkitSpeechRecognition();
@@ -470,28 +439,11 @@
           document.getElementById('search').value = event.results[0][0].transcript;
           document.getElementById('search').dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter' }));
         };
-        recognition.onerror = () => alert('Voice recognition failed.');
         recognition.start();
       } else {
         alert('Voice search not supported.');
       }
     });
-
-    // Placeholder for Traffic Layer
-    // const trafficLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { opacity: 0.5 });
-    // trafficLayer.addTo(map); // Uncomment and replace with real traffic data provider
-
-    // Placeholder for Satellite View
-    // const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    //   attribution: '© Esri'
-    // });
-    // document.getElementById('start-nav-btn').addEventListener('dblclick', () => satelliteLayer.addTo(map));
-
-    // Placeholder for Street View
-    // function showStreetView(latLng) {
-    //   console.log('Street View at:', latLng); // Replace with Google Street View integration
-    // }
-    // map.on('click', (e) => showStreetView(e.latlng));
 
     // Initialize
     getUserLocation(() => {});
