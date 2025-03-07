@@ -71,7 +71,7 @@ or you can just read the description for more details .
 ### Use Case Example
 There is a tourist who has just arrived to a huge railway station that he hasn't ever been in. The tourist opens the **Railway Navigator** application the moment he arrives. The app identifies where they are and they make use of the **search bar** in order to get information about where the nearest food stall is located. Once a destination is chosen, the application indicates the route on the map; however the traveler resorts to **AR mode** so as to be guided through 3D arrows pointing towards the food stall. In the process, they get crowd density real time so that they could avoid being in the crowded areas.
 
-Once aboard and fed, they set an **alarm** at their destination station, content in the knowledge that their app will alert them to board their train.
+Once aboard and fed, they set an **alarm** at their destination station, content in the knowledge that their app will alert them to board  or vacate their train.
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
