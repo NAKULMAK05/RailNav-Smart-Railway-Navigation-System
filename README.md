@@ -36,7 +36,7 @@ or you can just read the description for more details .
 - **Routing**: Whenever you select a destination, it will automatically determine the best routing within the station and give you turn-by-turn directions in either map view or AR.
 
 ### 5. Estimated Time and Distance
-   - **Distance to Destination**: The moment that one picks up a facility or platform, the app begins to calculate and display the distance (in kilometers or meters) from the current location.
+   - **Distance to Destination**: The moment that one picks up a facility or platform, the app begins to calculate and display the distance (in kilometers or meters) from the current location and shows the route in red.
 - **Time Estimate**: With the use of an estimate of a user's walking speed and route, this application informs them of how much time it will take to reach a destination they seek; it is very helpful for travelers who have to abide by a strict schedule 【7†source】.
  
 ### 6. Alarm and Notification System
