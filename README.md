@@ -50,6 +50,12 @@ or you can just read the description for more details .
 
 ## Output(Current Progress)
 
+### Flow Diagram
+![railway-syst-arch](https://github.com/user-attachments/assets/ba89d278-70f4-4426-88fe-027669af57b7)
+
+### System Architecture
+![railway-flowimg](https://github.com/user-attachments/assets/5042959c-e450-444e-b690-cadcdda9006f)
+
 ### 1st page [Login]
 ![Screenshot 2024-10-18 115011](https://github.com/user-attachments/assets/aa9ecbc4-701e-49ff-804f-2117dbd8a332)
 
