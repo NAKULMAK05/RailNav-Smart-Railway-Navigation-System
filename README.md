@@ -51,7 +51,7 @@ or you can just read the description for more details .
 ## Output(Current Progress)
 
 ### Flow Diagram
-![railway-syst-arch](https://github.com/user-attachments/assets/ba89d278-70f4-4426-88fe-027669af57b7)
+![railway-syst-arch](https://github.com/user-attachments/assets/8c88d24a-c0c3-4dfd-97c5-8af5bf4ef2ab)
 
 ### System Architecture
 ![railway-flowimg](https://github.com/user-attachments/assets/5042959c-e450-444e-b690-cadcdda9006f)
