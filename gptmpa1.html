@@ -6,34 +6,40 @@
   <meta name="description" content="Professional AR Railway Navigation" />
   <title>Railway Navigator</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     /* Global Styles */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+    }
+    
     :root {
-      --primary: #3a86ff;
-      --primary-dark: #2563eb;
-      --secondary: #ff006e;
-      --accent: #ffbe0b;
-      --dark: #1e293b;
-      --light: #f8fafc;
-      --gray: #94a3b8;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
-      --radius-sm: 0.375rem;
-      --radius-md: 0.5rem;
-      --radius-lg: 0.75rem;
+      --primary: #1a73e8;
+      --primary-light: #e8f0fe;
+      --primary-dark: #0d47a1;
+      --secondary: #ea4335;
+      --accent: #fbbc04;
+      --dark: #202124;
+      --light: #ffffff;
+      --gray: #70757a;
+      --gray-light: #f1f3f4;
+      --gray-dark: #5f6368;
+      --shadow-sm: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+      --shadow-md: 0 2px 6px rgba(60, 64, 67, 0.3), 0 1px 2px rgba(60, 64, 67, 0.2);
+      --shadow-lg: 0 4px 8px rgba(60, 64, 67, 0.3), 0 1px 3px rgba(60, 64, 67, 0.15);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
       --radius-full: 9999px;
-      --transition: all 0.3s ease;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-sans: 'Roboto', sans-serif;
     }
     
     body { 
-      font-family: 'Poppins', sans-serif; 
+      font-family: var(--font-sans); 
       overflow: hidden; 
       background-color: var(--light); 
       height: 100vh; 
@@ -49,220 +55,311 @@
       z-index: 1;
     }
 
-    /* Top Bar */
-    .top-bar {
+    /* Top Search Bar */
+    .search-bar {
       position: absolute; 
-      top: 0; 
-      left: 0; 
-      width: 100%; 
-      padding: 16px;
-      background: rgba(255, 255, 255, 0.95); 
-      backdrop-filter: blur(10px);
+      top: 16px; 
+      left: 16px; 
+      right: 16px;
+      background: var(--light); 
+      border-radius: var(--radius-full);
       box-shadow: var(--shadow-md); 
       z-index: 1000;
       display: flex; 
       align-items: center; 
-      gap: 12px;
-      border-bottom-left-radius: var(--radius-lg);
-      border-bottom-right-radius: var(--radius-lg);
+      height: 48px;
+      max-width: 600px;
+      margin: 0 auto;
+      overflow: hidden;
     }
     
-    .top-bar input {
-      flex: 1; 
-      padding: 14px 20px; 
-      border: 1px solid var(--gray); 
-      border-radius: var(--radius-full);
-      background: var(--light); 
-      font-size: 16px; 
-      outline: none;
-      transition: var(--transition);
-      font-family: 'Poppins', sans-serif;
-    }
-    
-    .top-bar input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.2);
-    }
-    
-    .top-bar button {
-      background: none; 
-      border: none; 
-      font-size: 20px; 
-      cursor: pointer; 
-      color: var(--primary);
-      width: 42px;
-      height: 42px;
-      border-radius: var(--radius-full);
+    .search-bar .back-btn {
+      width: 48px;
+      height: 48px;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--gray-dark);
+      cursor: pointer;
       transition: var(--transition);
     }
     
-    .top-bar button:hover {
-      background: rgba(58, 134, 255, 0.1);
-      transform: scale(1.05);
+    .search-bar .back-btn:hover {
+      color: var(--primary);
+      background-color: var(--primary-light);
+    }
+    
+    .search-bar input {
+      flex: 1; 
+      height: 100%;
+      padding: 0 16px; 
+      border: none; 
+      font-size: 16px; 
+      outline: none;
+      color: var(--dark);
+      background: transparent;
+    }
+    
+    .search-bar .voice-btn {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .search-bar .voice-btn:hover {
+      background-color: var(--primary-light);
     }
 
-    /* Info Panel */
-    .info-panel {
-      position: absolute; 
-      bottom: 90px; 
-      left: 16px; 
+    /* Map Controls */
+    .map-controls {
+      position: absolute;
       right: 16px;
-      background: rgba(255, 255, 255, 0.95); 
-      backdrop-filter: blur(10px);
-      border-radius: var(--radius-lg); 
-      padding: 20px;
-      box-shadow: var(--shadow-lg); 
-      z-index: 1000; 
-      display: none;
-      transform: translateY(20px);
-      opacity: 0;
-      transition: transform 0.4s ease, opacity 0.4s ease;
-      border: 1px solid rgba(148, 163, 184, 0.2);
+      bottom: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 900;
     }
     
-    .info-panel.active {
-      display: block;
+    .map-control-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: var(--light);
+      border: none;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-dark);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .map-control-btn:hover {
+      background-color: var(--gray-light);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .map-control-btn.active {
+      color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    /* Bottom Sheet */
+    .bottom-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--light);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateY(calc(100% - 120px));
+      max-height: 70vh;
+      overflow: hidden;
+    }
+    
+    .bottom-sheet.expanded {
       transform: translateY(0);
-      opacity: 1;
     }
     
-    .info-panel-header {
+    .bottom-sheet-handle {
+      width: 40px;
+      height: 5px;
+      background: var(--gray-light);
+      border-radius: 3px;
+      margin: 12px auto;
+      cursor: pointer;
+    }
+    
+    .bottom-sheet-content {
+      padding: 0 16px 16px;
+      overflow-y: auto;
+      max-height: calc(70vh - 30px);
+    }
+    
+    .route-info {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      margin-bottom: 16px;
     }
     
-    .info-panel-header h3 {
-      font-weight: 600;
-      color: var(--primary);
-      font-size: 18px;
+    .route-info-main {
+      display: flex;
+      flex-direction: column;
     }
     
-    .info-panel-header button {
-      background: none;
-      border: none;
-      color: var(--gray);
-      font-size: 18px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    
-    .info-panel-header button:hover {
-      color: var(--danger);
-    }
-    
-    .info-panel p { 
-      margin: 12px 0; 
-      font-size: 15px; 
+    .route-info-main h2 {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 4px;
       color: var(--dark);
+    }
+    
+    .route-info-main p {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    
+    .route-info-time {
+      text-align: right;
+    }
+    
+    .route-info-time .time {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--dark);
+    }
+    
+    .route-info-time .eta {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    
+    .route-details {
+      margin-top: 16px;
+    }
+    
+    .route-step {
+      display: flex;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    
+    .route-step:last-child {
+      margin-bottom: 0;
+    }
+    
+    .route-step-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: var(--primary-light);
       display: flex;
       align-items: center;
-    }
-    
-    .info-panel p i {
-      margin-right: 12px;
+      justify-content: center;
       color: var(--primary);
-      width: 24px;
-      text-align: center;
+      margin-right: 16px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
     }
     
-    .info-panel p span { 
-      font-weight: 600; 
-      color: var(--primary); 
-      margin-left: 5px;
-    }
-
-    /* Button Container */
-    .button-container {
-      position: absolute; 
-      bottom: 20px; 
-      left: 16px; 
-      right: 16px;
-      display: flex; 
-      justify-content: space-between; 
-      gap: 12px; 
-      z-index: 1001;
+    .route-step-content {
+      flex: 1;
     }
     
-    .button-container button {
-      flex: 1; 
-      padding: 16px; 
-      border: none; 
-      border-radius: var(--radius-full);
-      font-size: 16px; 
-      font-weight: 500; 
-      color: white; 
-      cursor: pointer;
-      transition: var(--transition);
+    .route-step-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      color: var(--dark);
+    }
+    
+    .route-step-subtitle {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    
+    .route-step-line {
+      position: absolute;
+      left: 16px;
+      top: 32px;
+      bottom: -20px;
+      width: 2px;
+      background: var(--primary-light);
+      z-index: 1;
+    }
+    
+    .route-step:last-child .route-step-line {
+      display: none;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    
+    .action-button {
+      flex: 1;
+      height: 48px;
+      border-radius: var(--radius-md);
+      border: none;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      box-shadow: var(--shadow-md);
-      font-family: 'Poppins', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
     }
     
-    #start-nav-btn { 
+    .action-button.primary {
       background: var(--primary);
+      color: white;
     }
     
-    #start-nav-btn:hover {
+    .action-button.primary:hover {
       background: var(--primary-dark);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
+      box-shadow: var(--shadow-md);
     }
     
-    #ar-btn { 
-      background: var(--secondary);
+    .action-button.secondary {
+      background: var(--primary-light);
+      color: var(--primary);
     }
     
-    #ar-btn:hover {
-      background: #d90062;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
+    .action-button.secondary:hover {
+      background: #d4e4fc;
+      box-shadow: var(--shadow-sm);
     }
     
-    #ar-btn:disabled { 
-      background: var(--gray); 
+    .action-button:disabled {
+      background: var(--gray-light);
+      color: var(--gray);
       cursor: not-allowed;
-      transform: none;
       box-shadow: none;
     }
 
     /* AR Container */
     #ar-container {
       position: fixed; 
-      bottom: 0; 
+      top: 0; 
       left: 0; 
       width: 100%; 
       height: 0;
       background: #000; 
       z-index: 2000; 
       overflow: hidden; 
-      transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      border-top-left-radius: var(--radius-lg);
-      border-top-right-radius: var(--radius-lg);
+      transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     #ar-container.active { 
-      height: 50vh;
-      box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
+      height: 100%;
     }
     
-    #ar-container video {
+    #video {
       width: 100%; 
       height: 100%; 
       object-fit: cover;
     }
     
-    /* AR Canvas over video */
-    #ar-container canvas {
+    #ar-canvas {
       position: absolute; 
       top: 0; 
       left: 0; 
@@ -272,82 +369,139 @@
       z-index: 10;
     }
     
-    /* AR Controls */
-    .ar-controls {
+    .ar-overlay {
       position: absolute;
-      top: 15px;
-      right: 15px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       z-index: 20;
-      display: flex;
-      gap: 10px;
+      pointer-events: none;
     }
     
-    .ar-controls button {
-      background: rgba(0, 0, 0, 0.5);
-      border: none;
+    .ar-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: all;
+    }
+    
+    .ar-close-btn {
       width: 40px;
       height: 40px;
       border-radius: var(--radius-full);
-      color: white;
+      background: rgba(0, 0, 0, 0.5);
+      border: none;
       display: flex;
       align-items: center;
       justify-content: center;
+      color: white;
       cursor: pointer;
       transition: var(--transition);
     }
     
-    .ar-controls button:hover {
+    .ar-close-btn:hover {
       background: rgba(0, 0, 0, 0.7);
     }
-
-    /* Leaflet Routing Machine */
-    .leaflet-routing-container {
-      background: white; 
-      border: none; 
-      box-shadow: var(--shadow-lg);
-      border-radius: var(--radius-lg); 
-      width: 100%; 
-      max-width: 320px; 
-      padding: 15px; 
-      font-size: 14px; 
-      z-index: 1000;
-      margin-top: 10px !important;
-      font-family: 'Poppins', sans-serif;
+    
+    .ar-info {
+      position: absolute;
+      bottom: 24px;
+      left: 16px;
+      right: 16px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-md);
+      pointer-events: all;
     }
     
-    .leaflet-routing-alt {
-      max-height: 300px;
-      overflow-y: auto;
-      padding-right: 10px;
+    .ar-info-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
     }
     
-    .leaflet-routing-alt h2 {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--primary);
-      margin-bottom: 10px;
-    }
-    
-    .leaflet-routing-alt h3 {
-      font-size: 14px;
+    .ar-info-header h3 {
+      font-size: 18px;
       font-weight: 500;
-      margin: 8px 0;
+      color: var(--dark);
     }
     
-    .leaflet-routing-alt table {
-      border-collapse: collapse;
-      width: 100%;
+    .ar-distance {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--primary);
     }
     
-    .leaflet-routing-alt tr:hover {
-      background: rgba(58, 134, 255, 0.05);
+    .ar-next-step {
+      font-size: 14px;
+      color: var(--gray-dark);
+      margin-bottom: 16px;
     }
     
-    .leaflet-routing-alt td {
-      padding: 8px 5px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    .ar-compass {
+      position: absolute;
+      top: 70px;
+      right: 16px;
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-md);
+      pointer-events: all;
     }
     
+    .compass-inner {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      border: 2px solid var(--primary);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .compass-needle {
+      position: absolute;
+      width: 2px;
+      height: 20px;
+      background: linear-gradient(to bottom, var(--primary) 50%, var(--secondary) 50%);
+      transform-origin: center;
+      transition: transform 0.3s ease;
+    }
+    
+    .compass-marker {
+      position: absolute;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    
+    .compass-marker.north {
+      top: 2px;
+    }
+    
+    .compass-marker.east {
+      right: 2px;
+    }
+    
+    .compass-marker.south {
+      bottom: 2px;
+    }
+    
+    .compass-marker.west {
+      left: 2px;
+    }
+
     /* Loading Indicator */
     .loading-indicator {
       position: absolute;
@@ -356,12 +510,12 @@
       transform: translate(-50%, -50%);
       z-index: 1500;
       background: rgba(255, 255, 255, 0.9);
-      padding: 20px;
+      padding: 16px 24px;
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-lg);
       display: none;
       align-items: center;
-      gap: 15px;
+      gap: 16px;
     }
     
     .loading-indicator.active {
@@ -371,153 +525,352 @@
     .loading-spinner {
       width: 24px;
       height: 24px;
-      border: 3px solid rgba(58, 134, 255, 0.3);
+      border: 3px solid rgba(26, 115, 232, 0.3);
       border-radius: 50%;
       border-top-color: var(--primary);
       animation: spin 1s linear infinite;
     }
     
+    .loading-text {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--dark);
+    }
+    
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-    
-    /* Pulse effect for user location */
-    .user-marker-pulse {
-      border-radius: 50%;
-      height: 14px;
-      width: 14px;
-      position: absolute;
+
+    /* Notification */
+    .notification {
+      position: fixed;
+      top: 80px;
       left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      background: var(--primary);
+      transform: translateX(-50%);
+      background: var(--dark);
+      color: white;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      max-width: 90%;
     }
     
-    .user-marker-pulse:after {
-      content: "";
-      border-radius: 50%;
-      height: 40px;
-      width: 40px;
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
+    .notification.active {
+      opacity: 1;
+    }
+    
+    .notification i {
+      font-size: 20px;
+    }
+    
+    .notification-message {
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    /* User Location Marker */
+    .user-location-marker {
+      background: transparent;
+      border: none;
+    }
+    
+    .user-location-dot {
+      width: 16px;
+      height: 16px;
       background: var(--primary);
-      opacity: 0;
+      border: 3px solid white;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+    }
+    
+    .user-location-accuracy {
+      width: 40px;
+      height: 40px;
+      background: rgba(26, 115, 232, 0.1);
+      border: 1px solid rgba(26, 115, 232, 0.2);
+      border-radius: 50%;
       animation: pulse 2s infinite;
     }
     
     @keyframes pulse {
       0% {
-        transform: translate(-50%, -50%) scale(0.5);
-        opacity: 0;
+        transform: scale(0.8);
+        opacity: 0.8;
       }
       50% {
+        transform: scale(1.2);
         opacity: 0.4;
       }
       100% {
-        transform: translate(-50%, -50%) scale(1.2);
-        opacity: 0;
+        transform: scale(0.8);
+        opacity: 0.8;
       }
     }
 
-    /* Mobile Optimization */
+    /* Destination Marker */
+    .destination-marker {
+      background: transparent;
+      border: none;
+    }
+    
+    .destination-pin {
+      width: 24px;
+      height: 24px;
+      background: var(--secondary);
+      border: 2px solid white;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+    
+    .destination-pin::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      background: white;
+      border-radius: 50%;
+    }
+
+    /* Responsive Styles */
     @media (max-width: 768px) {
-      .top-bar { 
-        padding: 12px; 
+      .search-bar {
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        height: 44px;
       }
       
-      .top-bar input { 
-        padding: 12px 16px; 
-        font-size: 15px; 
+      .map-controls {
+        right: 12px;
+        bottom: 180px;
       }
       
-      .info-panel { 
-        bottom: 85px; 
-        padding: 15px; 
+      .map-control-btn {
+        width: 36px;
+        height: 36px;
       }
       
-      .info-panel p { 
-        font-size: 14px; 
+      .bottom-sheet {
+        transform: translateY(calc(100% - 100px));
       }
       
-      .button-container button { 
-        padding: 14px; 
-        font-size: 15px; 
+      .route-info-main h2 {
+        font-size: 18px;
       }
       
-      #ar-container.active { 
-        height: 60vh; 
+      .route-info-time .time {
+        font-size: 18px;
+      }
+      
+      .action-button {
+        height: 44px;
+        font-size: 15px;
       }
     }
     
     @media (max-width: 480px) {
-      .top-bar { 
-        padding: 10px; 
+      .search-bar {
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        height: 40px;
       }
       
-      .top-bar input { 
-        padding: 10px 14px; 
-        font-size: 14px; 
+      .search-bar .back-btn,
+      .search-bar .voice-btn {
+        width: 40px;
+        height: 40px;
       }
       
-      .button-container { 
-        flex-direction: column; 
-        gap: 10px; 
+      .map-controls {
+        right: 8px;
+        bottom: 160px;
       }
       
-      .button-container button { 
-        padding: 12px; 
-        font-size: 14px; 
+      .map-control-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
       }
       
-      .info-panel-header h3 {
+      .bottom-sheet {
+        transform: translateY(calc(100% - 90px));
+      }
+      
+      .bottom-sheet-handle {
+        width: 36px;
+        margin: 10px auto;
+      }
+      
+      .route-info-main h2 {
         font-size: 16px;
       }
       
-      .info-panel p {
+      .route-info-main p {
         font-size: 13px;
+      }
+      
+      .route-info-time .time {
+        font-size: 16px;
+      }
+      
+      .route-info-time .eta {
+        font-size: 13px;
+      }
+      
+      .route-step-icon {
+        width: 28px;
+        height: 28px;
+        margin-right: 12px;
+      }
+      
+      .route-step-title {
+        font-size: 15px;
+      }
+      
+      .route-step-subtitle {
+        font-size: 13px;
+      }
+      
+      .action-buttons {
+        gap: 12px;
+      }
+      
+      .action-button {
+        height: 40px;
+        font-size: 14px;
+      }
+      
+      .ar-info {
+        padding: 12px;
+      }
+      
+      .ar-info-header h3 {
+        font-size: 16px;
+      }
+      
+      .ar-compass {
+        width: 50px;
+        height: 50px;
+      }
+      
+      .compass-inner {
+        width: 34px;
+        height: 34px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="top-bar">
-    <button id="back-btn" style="display: none;"><i class="fas fa-arrow-left"></i></button>
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <button id="back-btn" class="back-btn" style="display: none;">
+      <i class="fas fa-arrow-left"></i>
+    </button>
     <input type="text" id="search" placeholder="Search destination" aria-label="Search destination" />
-    <button id="voice-search-btn"><i class="fas fa-microphone"></i></button>
+    <button id="voice-search-btn" class="voice-btn">
+      <i class="fas fa-microphone"></i>
+    </button>
   </div>
   
+  <!-- Map Container -->
   <div id="map"></div>
   
-  <div class="info-panel" id="info-panel">
-    <div class="info-panel-header">
-      <h3>Navigation Details</h3>
-      <button id="close-info"><i class="fas fa-times"></i></button>
+  <!-- Map Controls -->
+  <div class="map-controls">
+    <button id="zoom-in-btn" class="map-control-btn">
+      <i class="fas fa-plus"></i>
+    </button>
+    <button id="zoom-out-btn" class="map-control-btn">
+      <i class="fas fa-minus"></i>
+    </button>
+    <button id="locate-me-btn" class="map-control-btn">
+      <i class="fas fa-location-crosshairs"></i>
+    </button>
+    <button id="layers-btn" class="map-control-btn">
+      <i class="fas fa-layer-group"></i>
+    </button>
+  </div>
+  
+  <!-- Bottom Sheet -->
+  <div id="bottom-sheet" class="bottom-sheet">
+    <div id="bottom-sheet-handle" class="bottom-sheet-handle"></div>
+    <div class="bottom-sheet-content">
+      <div class="route-info">
+        <div class="route-info-main">
+          <h2>Navigation Details</h2>
+          <p>Walking directions to destination</p>
+        </div>
+        <div class="route-info-time">
+          <div class="time" id="route-time">--</div>
+          <div class="eta" id="route-eta">ETA: --</div>
+        </div>
+      </div>
+      
+      <div class="route-details" id="route-details">
+        <!-- Route steps will be inserted here dynamically -->
+      </div>
+      
+      <div class="action-buttons">
+        <button id="start-nav-btn" class="action-button primary">
+          <i class="fas fa-directions"></i>
+          <span>Start</span>
+        </button>
+        <button id="ar-btn" class="action-button secondary" disabled>
+          <i class="fas fa-vr-cardboard"></i>
+          <span>AR View</span>
+        </button>
+      </div>
     </div>
-    <p><i class="fas fa-route"></i>Distance: <span id="distance">--</span></p>
-    <p><i class="fas fa-clock"></i>Time: <span id="time">--</span></p>
-    <p><i class="fas fa-hourglass-half"></i>ETA: <span id="eta">--</span></p>
-    <p><i class="fas fa-walking"></i>Next Step: <span id="next-step">--</span></p>
   </div>
   
-  <div class="button-container">
-    <button id="start-nav-btn"><i class="fas fa-map-marker-alt"></i> Start Navigation</button>
-    <button id="ar-btn" disabled><i class="fas fa-vr-cardboard"></i> Enable AR</button>
-  </div>
-  
+  <!-- AR Container -->
   <div id="ar-container">
     <video id="video" autoplay playsinline muted></video>
     <canvas id="ar-canvas"></canvas>
-    <div class="ar-controls">
-      <button id="close-ar"><i class="fas fa-times"></i></button>
-      <button id="toggle-fullscreen-ar"><i class="fas fa-expand"></i></button>
+    
+    <div class="ar-overlay">
+      <div class="ar-header">
+        <button id="ar-close-btn" class="ar-close-btn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="ar-compass" id="ar-compass">
+        <div class="compass-inner">
+          <div class="compass-needle" id="compass-needle"></div>
+          <div class="compass-marker north">N</div>
+          <div class="compass-marker east">E</div>
+          <div class="compass-marker south">S</div>
+          <div class="compass-marker west">W</div>
+        </div>
+      </div>
+      
+      <div class="ar-info">
+        <div class="ar-info-header">
+          <h3>Follow the arrow</h3>
+          <div class="ar-distance" id="ar-distance">-- m</div>
+        </div>
+        <div class="ar-next-step" id="ar-next-step">--</div>
+      </div>
     </div>
   </div>
   
-  <div class="loading-indicator" id="loading-indicator">
+  <!-- Loading Indicator -->
+  <div id="loading-indicator" class="loading-indicator">
     <div class="loading-spinner"></div>
-    <span>Calculating route...</span>
+    <div class="loading-text">Finding the best route...</div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
@@ -527,19 +880,18 @@
      * INITIALIZATION
      *********************/
     const map = L.map('map', { zoomControl: false }).setView([21.1522, 79.0888], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-      maxZoom: 19
-    }).addTo(map);
-
-    // Add zoom control to bottom right
-    L.control.zoom({
-      position: 'bottomright'
+    
+    // Use a cleaner map style similar to Google Maps
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 20
     }).addTo(map);
 
     // Global State Variables
     let userMarker = null;
     let userAccuracyCircle = null;
+    let destinationMarker = null;
     let destinationLatLng = null;
     let routingControl = null;
     let isARModeEnabled = false;
@@ -549,26 +901,74 @@
     let routeCoordinates = [];
     let instructions = [];
     let deviceOrientationListenerAdded = false;
+    let bottomSheetExpanded = false;
+    let mapLayersVisible = false;
+    
+    // DOM Elements
     const loadingIndicator = document.getElementById('loading-indicator');
-    const infoPanel = document.getElementById('info-panel');
+    const bottomSheet = document.getElementById('bottom-sheet');
+    const bottomSheetHandle = document.getElementById('bottom-sheet-handle');
+    const routeDetails = document.getElementById('route-details');
+    const arContainer = document.getElementById('ar-container');
+    const compassNeedle = document.getElementById('compass-needle');
 
     // Create custom user location marker
     function createUserMarker(latlng) {
       const markerHtml = `
-        <div class="user-marker-pulse"></div>
+        <div class="user-location-marker">
+          <div class="user-location-accuracy"></div>
+          <div class="user-location-dot"></div>
+        </div>
       `;
       
       const icon = L.divIcon({
         html: markerHtml,
-        className: 'user-location-marker',
-        iconSize: [20, 20],
-        iconAnchor: [10, 10]
+        className: 'user-location-marker-container',
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
       });
       
       return L.marker(latlng, {
         icon: icon,
         zIndexOffset: 1000
       });
+    }
+    
+    // Create custom destination marker
+    function createDestinationMarker(latlng, title) {
+      const markerHtml = `
+        <div class="destination-marker">
+          <div class="destination-pin"></div>
+        </div>
+      `;
+      
+      const icon = L.divIcon({
+        html: markerHtml,
+        className: 'destination-marker-container',
+        iconSize: [24, 24],
+        iconAnchor: [12, 24]
+      });
+      
+      const marker = L.marker(latlng, {
+        icon: icon,
+        zIndexOffset: 900
+      });
+      
+      if (title) {
+        marker.  {
+        icon: icon,
+        zIndexOffset: 900
+      });
+      
+      if (title) {
+        marker.bindPopup(`<b>${title}</b>`, {
+          offset: [0, -20],
+          closeButton: false,
+          className: 'destination-popup'
+        });
+      }
+      
+      return marker;
     }
 
     // Hardcoded Nagpur Central Station Data
@@ -593,7 +993,7 @@
      * GEOLOCATION FUNCTIONS
      *********************/
     function getUserLocation(callback) {
-      loadingIndicator.classList.add('active');
+      showLoading('Getting your location...');
       
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -607,9 +1007,9 @@
               // Add accuracy circle
               userAccuracyCircle = L.circle(userLatLng, {
                 radius: accuracy,
-                color: '#3a86ff',
-                fillColor: '#3a86ff',
-                fillOpacity: 0.1,
+                color: 'rgba(26, 115, 232, 0.2)',
+                fillColor: 'rgba(26, 115, 232, 0.1)',
+                fillOpacity: 0.4,
                 weight: 1
               }).addTo(map);
             } else {
@@ -619,12 +1019,12 @@
             }
             
             map.panTo(userLatLng, { animate: true });
-            loadingIndicator.classList.remove('active');
+            hideLoading();
             
             if (callback) callback(userLatLng);
           },
           (error) => {
-            loadingIndicator.classList.remove('active');
+            hideLoading();
             console.error('Geolocation error:', error);
             
             let errorMsg = 'Unable to retrieve your location.';
@@ -641,7 +1041,7 @@
           { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
       } else {
-        loadingIndicator.classList.remove('active');
+        hideLoading();
         showNotification('Geolocation is not supported by your browser.', 'error');
       }
     }
@@ -675,7 +1075,7 @@
      * ROUTING & NAVIGATION
      *********************/
     function updateRoute(userLatLng, retryCount = 0) {
-      loadingIndicator.classList.add('active');
+      showLoading('Finding the best route...');
       
       if (routingControl) map.removeControl(routingControl);
       
@@ -683,28 +1083,22 @@
         waypoints: [userLatLng, destinationLatLng],
         routeWhileDragging: false,
         lineOptions: { 
-          styles: [{ color: '#3a86ff', weight: 5, opacity: 0.7 }],
+          styles: [{ 
+            color: '#1a73e8', 
+            weight: 5, 
+            opacity: 0.7,
+            lineCap: 'round',
+            lineJoin: 'round'
+          }],
           extendToWaypoints: true,
           missingRouteTolerance: 0
         },
-        show: true,
+        show: false, // Hide the default instructions panel
         addWaypoints: false,
         draggableWaypoints: false,
         fitSelectedRoutes: true,
         showAlternatives: false,
-        createMarker: function(i, wp) {
-          if (i === 0) return null; // Don't show marker for starting point
-          
-          // Custom marker for destination
-          return L.marker(wp.latLng, {
-            icon: L.divIcon({
-              className: 'destination-marker',
-              html: '<i class="fas fa-map-marker-alt" style="font-size: 24px; color: #ff006e;"></i>',
-              iconSize: [24, 24],
-              iconAnchor: [12, 24]
-            })
-          });
-        },
+        createMarker: function() { return null; }, // We'll create our own markers
         router: L.Routing.osrmv1({ 
           serviceUrl: 'https://router.project-osrm.org/route/v1',
           profile: 'foot' // Use walking profile
@@ -716,14 +1110,22 @@
         instructions = routes.instructions;
         
         updateNavigationInfo(userLatLng);
-        infoPanel.classList.add('active');
+        renderRouteDetails(routes);
+        
+        // Show the bottom sheet
+        bottomSheet.style.display = 'block';
+        
+        // Enable AR button
         document.getElementById('ar-btn').disabled = false;
         
-        loadingIndicator.classList.remove('active');
+        // Show back button
+        document.getElementById('back-btn').style.display = 'block';
+        
+        hideLoading();
       })
       .on('routingerror', (e) => {
         console.error('Routing error:', e);
-        loadingIndicator.classList.remove('active');
+        hideLoading();
         
         if (retryCount < 3) {
           setTimeout(() => updateRoute(userLatLng, retryCount + 1), 1000);
@@ -737,22 +1139,91 @@
     function updateNavigationInfo(userLatLng) {
       if (!routeCoordinates.length || !routingControl._routes?.[0]?.summary) return;
       
-      const totalDistance = userLatLng.distanceTo(destinationLatLng) / 1000; // km
-      const totalTime = routingControl._routes[0].summary.totalTime / 60; // mins
-      const eta = new Date(Date.now() + totalTime * 60 * 1000).toLocaleTimeString([], { 
+      const totalDistance = userLatLng.distanceTo(destinationLatLng);
+      const totalTime = routingControl._routes[0].summary.totalTime;
+      
+      // Format time (minutes and seconds)
+      let timeText;
+      if (totalTime < 60) {
+        timeText = `${Math.round(totalTime)} sec`;
+      } else {
+        const minutes = Math.floor(totalTime / 60);
+        timeText = `${minutes} min`;
+      }
+      
+      // Format ETA
+      const eta = new Date(Date.now() + totalTime * 1000).toLocaleTimeString([], { 
         hour: '2-digit', 
         minute: '2-digit' 
       });
       
+      // Find next instruction
       const nextInstruction = instructions.find(instr => {
         const point = routeCoordinates[instr.index];
         return L.latLng(point.lat, point.lng).distanceTo(userLatLng) > 5;
       }) || { text: 'Arrived at destination' };
 
-      document.getElementById('distance').innerHTML = `${totalDistance.toFixed(2)} km`;
-      document.getElementById('time').innerHTML = `${totalTime.toFixed(1)} mins`;
-      document.getElementById('eta').innerHTML = eta;
-      document.getElementById('next-step').innerHTML = nextInstruction.text;
+      // Update bottom sheet
+      document.getElementById('route-time').innerHTML = timeText;
+      document.getElementById('route-eta').innerHTML = `ETA: ${eta}`;
+      
+      // Update AR view if active
+      if (isARModeEnabled) {
+        document.getElementById('ar-distance').innerHTML = totalDistance < 1000 ? 
+          `${Math.round(totalDistance)} m` : 
+          `${(totalDistance / 1000).toFixed(2)} km`;
+        document.getElementById('ar-next-step').innerHTML = nextInstruction.text;
+      }
+    }
+
+    function renderRouteDetails(route) {
+      routeDetails.innerHTML = '';
+      
+      if (!route.instructions || route.instructions.length === 0) {
+        return;
+      }
+      
+      // Create route steps
+      route.instructions.forEach((instruction, index) => {
+        const stepElement = document.createElement('div');
+        stepElement.className = 'route-step';
+        
+        // Determine icon based on instruction type
+        let iconClass = 'fa-arrow-right';
+        if (instruction.type === 'Straight') iconClass = 'fa-arrow-up';
+        else if (instruction.type === 'SlightRight') iconClass = 'fa-arrow-up-right';
+        else if (instruction.type === 'Right') iconClass = 'fa-arrow-right';
+        else if (instruction.type === 'SharpRight') iconClass = 'fa-arrow-right';
+        else if (instruction.type === 'SlightLeft') iconClass = 'fa-arrow-up-left';
+        else if (instruction.type === 'Left') iconClass = 'fa-arrow-left';
+        else if (instruction.type === 'SharpLeft') iconClass = 'fa-arrow-left';
+        else if (instruction.type === 'Uturn') iconClass = 'fa-arrow-turn-up';
+        else if (instruction.type === 'Roundabout') iconClass = 'fa-rotate-right';
+        else if (instruction.type === 'DestinationReached') iconClass = 'fa-location-dot';
+        
+        // Format distance
+        let distanceText = '';
+        if (instruction.distance) {
+          if (instruction.distance < 1000) {
+            distanceText = `${Math.round(instruction.distance)} m`;
+          } else {
+            distanceText = `${(instruction.distance / 1000).toFixed(2)} km`;
+          }
+        }
+        
+        stepElement.innerHTML = `
+          <div class="route-step-icon">
+            <i class="fas ${iconClass}"></i>
+          </div>
+          <div class="route-step-line"></div>
+          <div class="route-step-content">
+            <div class="route-step-title">${instruction.text}</div>
+            <div class="route-step-subtitle">${distanceText}</div>
+          </div>
+        `;
+        
+        routeDetails.appendChild(stepElement);
+      });
     }
 
     /*********************
@@ -766,55 +1237,37 @@
         return;
       }
       
-      loadingIndicator.classList.add('active');
+      showLoading('Searching for location...');
       
       if (customLocations[query]) {
         destinationLatLng = L.latLng(customLocations[query].lat, customLocations[query].lng);
         
-        // Clear previous markers
-        map.eachLayer(layer => {
-          if (layer instanceof L.Marker && layer !== userMarker) {
-            map.removeLayer(layer);
-          }
-        });
+        // Clear previous destination marker
+        if (destinationMarker) {
+          map.removeLayer(destinationMarker);
+        }
         
         // Add destination marker
-        L.marker(destinationLatLng, {
-          icon: L.divIcon({
-            className: 'destination-marker',
-            html: '<i class="fas fa-map-marker-alt" style="font-size: 24px; color: #ff006e;"></i>',
-            iconSize: [24, 24],
-            iconAnchor: [12, 24]
-          })
-        }).addTo(map).bindPopup(`<b>${query}</b>`).openPopup();
+        destinationMarker = createDestinationMarker(destinationLatLng, query).addTo(map);
         
         getUserLocation((userLatLng) => updateRoute(userLatLng));
-        loadingIndicator.classList.remove('active');
+        hideLoading();
       } else {
         fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
           .then(res => res.json())
           .then(data => {
-            loadingIndicator.classList.remove('active');
+            hideLoading();
             
             if (data.length) {
               destinationLatLng = L.latLng(parseFloat(data[0].lat), parseFloat(data[0].lon));
               
-              // Clear previous markers
-              map.eachLayer(layer => {
-                if (layer instanceof L.Marker && layer !== userMarker) {
-                  map.removeLayer(layer);
-                }
-              });
+              // Clear previous destination marker
+              if (destinationMarker) {
+                map.removeLayer(destinationMarker);
+              }
               
               // Add destination marker
-              L.marker(destinationLatLng, {
-                icon: L.divIcon({
-                  className: 'destination-marker',
-                  html: '<i class="fas fa-map-marker-alt" style="font-size: 24px; color: #ff006e;"></i>',
-                  iconSize: [24, 24],
-                  iconAnchor: [12, 24]
-                })
-              }).addTo(map).bindPopup(`<b>${data[0].display_name}</b>`).openPopup();
+              destinationMarker = createDestinationMarker(destinationLatLng, data[0].display_name).addTo(map);
               
               getUserLocation((userLatLng) => updateRoute(userLatLng));
             } else {
@@ -822,195 +1275,77 @@
             }
           })
           .catch(err => {
-            loadingIndicator.classList.remove('active');
+            hideLoading();
             console.error('Search error:', err);
             showNotification('Search failed. Please check your connection and try again.', 'error');
           });
       }
     }
 
-    // Helper function to show notifications
+    /*********************
+     * UI HELPERS
+     *********************/
+    function showLoading(message) {
+      const loadingText = document.querySelector('.loading-text');
+      if (loadingText) {
+        loadingText.textContent = message || 'Loading...';
+      }
+      loadingIndicator.classList.add('active');
+    }
+    
+    function hideLoading() {
+      loadingIndicator.classList.remove('active');
+    }
+    
     function showNotification(message, type = 'info') {
+      // Remove any existing notification
+      const existingNotification = document.querySelector('.notification');
+      if (existingNotification) {
+        document.body.removeChild(existingNotification);
+      }
+      
+      // Create new notification
       const notification = document.createElement('div');
       notification.className = `notification ${type}`;
+      
+      let icon = 'fa-info-circle';
+      if (type === 'error') icon = 'fa-exclamation-circle';
+      else if (type === 'warning') icon = 'fa-exclamation-triangle';
+      else if (type === 'success') icon = 'fa-check-circle';
+      
       notification.innerHTML = `
-        <div class="notification-content">
-          <i class="fas fa-${type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
-          <span>${message}</span>
-        </div>
+        <i class="fas ${icon}"></i>
+        <span class="notification-message">${message}</span>
       `;
       
       document.body.appendChild(notification);
       
-      // Add styles dynamically
-      notification.style.position = 'fixed';
-      notification.style.top = '80px';
-      notification.style.left = '50%';
-      notification.style.transform = 'translateX(-50%)';
-      notification.style.backgroundColor = type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#3a86ff';
-      notification.style.color = 'white';
-      notification.style.padding = '12px 20px';
-      notification.style.borderRadius = '8px';
-      notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-      notification.style.zIndex = '2000';
-      notification.style.opacity = '0';
-      notification.style.transition = 'opacity 0.3s, transform 0.3s';
-      
-      // Animation
+      // Show notification with animation
       setTimeout(() => {
-        notification.style.opacity = '1';
-        notification.style.transform = 'translateX(-50%) translateY(0)';
+        notification.classList.add('active');
       }, 10);
       
-      // Auto remove after 4 seconds
+      // Auto hide after 4 seconds
       setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateX(-50%) translateY(-20px)';
+        notification.classList.remove('active');
         
         setTimeout(() => {
-          document.body.removeChild(notification);
+          if (notification.parentNode) {
+            document.body.removeChild(notification);
+          }
         }, 300);
       }, 4000);
     }
 
-    document.getElementById('search').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        processSearch(e.target.value);
-      }
-    });
-
-    document.getElementById('voice-search-btn').addEventListener('click', () => {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      
-      if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'en-US';
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
-        
-        // Show listening indicator
-        const searchInput = document.getElementById('search');
-        const originalPlaceholder = searchInput.placeholder;
-        searchInput.placeholder = '🎤 Listening...';
-        document.getElementById('voice-search-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        
-        recognition.onresult = (event) => {
-          const transcript = event.results[0][0].transcript;
-          searchInput.value = transcript;
-          searchInput.placeholder = originalPlaceholder;
-          document.getElementById('voice-search-btn').innerHTML = '<i class="fas fa-microphone"></i>';
-          processSearch(transcript);
-        };
-        
-        recognition.onerror = (event) => {
-          console.error('Voice recognition error:', event.error);
-          searchInput.placeholder = originalPlaceholder;
-          document.getElementById('voice-search-btn').innerHTML = '<i class="fas fa-microphone"></i>';
-          showNotification('Voice recognition failed. Please try again or type your search.', 'warning');
-        };
-        
-        recognition.onend = () => {
-          searchInput.placeholder = originalPlaceholder;
-          document.getElementById('voice-search-btn').innerHTML = '<i class="fas fa-microphone"></i>';
-        };
-        
-        recognition.start();
-      } else {
-        showNotification('Voice search is not supported in your browser.', 'warning');
-      }
-    });
-
     /*********************
-     * BUTTONS & NAVIGATION HANDLERS
+     * AR NAVIGATION
      *********************/
-    document.getElementById('start-nav-btn').addEventListener('click', () => {
-      getUserLocation((userLatLng) => {
-        if (destinationLatLng) {
-          updateRoute(userLatLng);
-          document.getElementById('back-btn').style.display = 'inline-block';
-        } else {
-          showNotification('Please select a destination first!', 'warning');
-        }
-      });
-    });
-
-    document.getElementById('back-btn').addEventListener('click', () => {
-      if (routingControl) map.removeControl(routingControl);
-      infoPanel.classList.remove('active');
-      document.getElementById('ar-btn').disabled = true;
-      document.getElementById('back-btn').style.display = 'none';
-      document.getElementById('ar-container').classList.remove('active');
-      isARModeEnabled = false;
-      
-      // Stop AR video tracks
-      const videoElem = document.getElementById('video');
-      if (videoElem.srcObject) {
-        videoElem.srcObject.getTracks().forEach(track => track.stop());
-      }
-      
-      routeCoordinates = [];
-      instructions = [];
-      
-      // Clear destination marker
-      map.eachLayer(layer => {
-        if (layer instanceof L.Marker && layer !== userMarker) {
-          map.removeLayer(layer);
-        }
-      });
-      
-      destinationLatLng = null;
-      document.getElementById('search').value = '';
-    });
-
-    // Close info panel
-    document.getElementById('close-info').addEventListener('click', () => {
-      infoPanel.classList.remove('active');
-    });
-
-    /*********************
-     * AR NAVIGATION & HELPER FUNCTIONS
-     *********************/
-    document.getElementById('ar-btn').addEventListener('click', () => {
-      if (!isARModeEnabled) {
-        isARModeEnabled = true;
-        document.getElementById('ar-container').classList.add('active');
-        document.getElementById('ar-btn').disabled = true;
-        startAR();
-      }
-    });
-
-    // Close AR view
-    document.getElementById('close-ar').addEventListener('click', () => {
-      document.getElementById('ar-container').classList.remove('active');
-      isARModeEnabled = false;
-      document.getElementById('ar-btn').disabled = false;
-      
-      // Stop video tracks
-      const videoElem = document.getElementById('video');
-      if (videoElem.srcObject) {
-        videoElem.srcObject.getTracks().forEach(track => track.stop());
-      }
-    });
-
-    // Toggle AR fullscreen
-    document.getElementById('toggle-fullscreen-ar').addEventListener('click', () => {
-      const arContainer = document.getElementById('ar-container');
-      
-      if (arContainer.classList.contains('fullscreen')) {
-        arContainer.classList.remove('fullscreen');
-        arContainer.style.height = '50vh';
-        document.getElementById('toggle-fullscreen-ar').innerHTML = '<i class="fas fa-expand"></i>';
-      } else {
-        arContainer.classList.add('fullscreen');
-        arContainer.style.height = '100vh';
-        document.getElementById('toggle-fullscreen-ar').innerHTML = '<i class="fas fa-compress"></i>';
-      }
-    });
-
-    let video = document.getElementById('video');
     function startAR() {
+      showLoading('Starting AR mode...');
+      
       navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
         .then((stream) => {
+          const video = document.getElementById('video');
           video.srcObject = stream;
           video.play();
           
@@ -1024,12 +1359,14 @@
             };
             
             updateFrame();
+            hideLoading();
           });
         })
         .catch((err) => {
+          hideLoading();
           console.error('Error accessing camera:', err);
           showNotification('Camera access failed. Please allow camera permissions.', 'error');
-          document.getElementById('ar-container').classList.remove('active');
+          arContainer.classList.remove('active');
           isARModeEnabled = false;
           document.getElementById('ar-btn').disabled = false;
         });
@@ -1058,7 +1395,15 @@
 
     function handleOrientation(event) {
       currentHeading = event.alpha || 0;
-      if (destinationLatLng && isARModeEnabled) updateAR(currentHeading);
+      
+      // Update compass
+      if (compassNeedle) {
+        compassNeedle.style.transform = `rotate(${currentHeading}deg)`;
+      }
+      
+      if (destinationLatLng && isARModeEnabled) {
+        updateAR(currentHeading);
+      }
     }
 
     function updateAR(compassHeading) {
@@ -1068,63 +1413,99 @@
       const destinationHeading = calculateHeading(userLatLng, destinationLatLng);
       const arrowRotation = (compassHeading - destinationHeading + 360) % 360;
       
+      // Clear canvas
       arrowContext.clearRect(0, 0, arrowCanvas.width, arrowCanvas.height);
-      drawArrow(arrowContext, arrowCanvas.width / 2, arrowCanvas.height / 2, arrowRotation);
       
-      // Add distance indicator
-      const distance = userLatLng.distanceTo(destinationLatLng);
-      arrowContext.font = 'bold 24px Poppins, sans-serif';
-      arrowContext.fillStyle = 'white';
-      arrowContext.textAlign = 'center';
-      arrowContext.shadowColor = 'rgba(0, 0, 0, 0.5)';
-      arrowContext.shadowBlur = 5;
-      arrowContext.fillText(`${(distance / 1000).toFixed(2)} km`, arrowCanvas.width / 2, arrowCanvas.height - 50);
+      // Draw arrow
+      drawGoogleStyleArrow(
+        arrowContext, 
+        arrowCanvas.width / 2, 
+        arrowCanvas.height / 2, 
+        arrowRotation,
+        userLatLng.distanceTo(destinationLatLng)
+      );
     }
 
-    // Draw a more realistic 3D arrow using gradient and shadow
-    function drawArrow(ctx, x, y, rotation) {
+    function drawGoogleStyleArrow(ctx, x, y, rotation, distance) {
+      const canvasWidth = ctx.canvas.width;
+      const canvasHeight = ctx.canvas.height;
+      
+      // Calculate arrow size based on canvas dimensions
+      const arrowSize = Math.min(canvasWidth, canvasHeight) * 0.25;
+      
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(rotation * Math.PI / 180);
+      
+      // Draw arrow shadow
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
       ctx.shadowBlur = 15;
-      ctx.shadowColor = "rgba(0, 0, 0, 0.7)";
+      ctx.shadowOffsetY = 5;
       
-      // Create gradient for a 3D effect
-      let gradient = ctx.createLinearGradient(-20, -70, 20, 0);
-      gradient.addColorStop(0, "#3a86ff");
-      gradient.addColorStop(1, "#4361ee");
+      // Draw arrow body
+      const gradient = ctx.createLinearGradient(0, -arrowSize, 0, arrowSize/2);
+      gradient.addColorStop(0, '#1a73e8');
+      gradient.addColorStop(1, '#4285f4');
       
-      // Draw arrow shape
       ctx.beginPath();
-      ctx.moveTo(-20, -70);
-      ctx.lineTo(20, -70);
-      ctx.lineTo(20, 0);
-      ctx.lineTo(40, 0);
-      ctx.lineTo(0, 100);
-      ctx.lineTo(-40, 0);
-      ctx.lineTo(-20, 0);
-      ctx.closePath();
       
-      // Add 3D effect with gradient
+      // Arrow shape - Google Maps style
+      const arrowWidth = arrowSize * 0.5;
+      
+      // Arrow head
+      ctx.moveTo(0, -arrowSize);
+      ctx.lineTo(arrowWidth, 0);
+      ctx.lineTo(arrowWidth/2, 0);
+      ctx.lineTo(arrowWidth/2, arrowSize/2);
+      ctx.lineTo(-arrowWidth/2, arrowSize/2);
+      ctx.lineTo(-arrowWidth/2, 0);
+      ctx.lineTo(-arrowWidth, 0);
+      
+      ctx.closePath();
       ctx.fillStyle = gradient;
       ctx.fill();
       
-      // Add highlight
+      // Add a highlight effect
       ctx.beginPath();
-      ctx.moveTo(-10, -60);
-      ctx.lineTo(10, -60);
-      ctx.lineTo(10, -10);
-      ctx.lineTo(-10, -10);
+      ctx.moveTo(0, -arrowSize + 5);
+      ctx.lineTo(arrowWidth - 5, 0);
+      ctx.lineTo(0, -arrowSize/2);
+      ctx.lineTo(-arrowWidth + 5, 0);
       ctx.closePath();
-      ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
       ctx.fill();
       
-      // Add outline
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "#fff";
-      ctx.stroke();
+      // Draw distance indicator if we're close enough
+      if (distance < 200) {
+        ctx.shadowColor = 'transparent';
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 24px Roboto, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${Math.round(distance)}m`, 0, arrowSize + 40);
+      }
       
       ctx.restore();
+      
+      // Draw pulsing circle at the bottom if we're very close
+      if (distance < 50) {
+        const now = Date.now() / 1000;
+        const scale = 0.5 + Math.sin(now * 3) * 0.2;
+        
+        ctx.save();
+        ctx.translate(x, y);
+        
+        ctx.beginPath();
+        ctx.arc(0, 0, 30 * scale, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(26, 115, 232, 0.3)';
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(0, 0, 15 * scale, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(26, 115, 232, 0.6)';
+        ctx.fill();
+        
+        ctx.restore();
+      }
     }
 
     function calculateHeading(from, to) {
@@ -1138,9 +1519,164 @@
     }
 
     /*********************
+     * EVENT LISTENERS
+     *********************/
+    // Search input
+    document.getElementById('search').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        processSearch(e.target.value);
+      }
+    });
+
+    // Voice search
+    document.getElementById('voice-search-btn').addEventListener('click', () => {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        
+        // Show listening indicator
+        const searchInput = document.getElementById('search');
+        const originalPlaceholder = searchInput.placeholder;
+        searchInput.placeholder = 'Listening...';
+        document.getElementById('voice-search-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          searchInput.value = transcript;
+          searchInput.placeholder = originalPlaceholder;
+          document.getElementById('voice-search-btn').innerHTML = '<i class="fas fa-microphone"></i>';
+          processSearch(transcript);
+        };
+        
+        recognition.onerror = (event) => {
+          console.error('Voice recognition error:', event.error);
+          searchInput.placeholder = originalPlaceholder;
+          document.getElementById('voice-search-btn').innerHTML = '<i class="fas fa-microphone"></i>';
+          showNotification('Voice recognition failed. Please try again or type your search.', 'warning');
+        };
+        
+        recognition.onend = () => {
+          searchInput.placeholder = originalPlaceholder;
+          document.getElementById('voice-search-btn').innerHTML = '<i class="fas fa-microphone"></i>';
+        };
+        
+        recognition.start();
+      } else {
+        showNotification('Voice search is not supported in your browser.', 'warning');
+      }
+    });
+
+    // Start navigation
+    document.getElementById('start-nav-btn').addEventListener('click', () => {
+      getUserLocation((userLatLng) => {
+        if (destinationLatLng) {
+          updateRoute(userLatLng);
+          document.getElementById('back-btn').style.display = 'block';
+        } else {
+          showNotification('Please select a destination first!', 'warning');
+        }
+      });
+    });
+
+    // Back button
+    document.getElementById('back-btn').addEventListener('click', () => {
+      // Reset navigation
+      if (routingControl) map.removeControl(routingControl);
+      document.getElementById('back-btn').style.display = 'none';
+      document.getElementById('ar-btn').disabled = true;
+      
+      // Hide bottom sheet
+      bottomSheet.style.display = 'none';
+      bottomSheet.classList.remove('expanded');
+      bottomSheetExpanded = false;
+      
+      // Clear AR mode
+      if (isARModeEnabled) {
+        arContainer.classList.remove('active');
+        isARModeEnabled = false;
+        
+        // Stop video tracks
+        const videoElem = document.getElementById('video');
+        if (videoElem.srcObject) {
+          videoElem.srcObject.getTracks().forEach(track => track.stop());
+        }
+      }
+      
+      // Clear destination
+      if (destinationMarker) {
+        map.removeLayer(destinationMarker);
+        destinationMarker = null;
+      }
+      
+      destinationLatLng = null;
+      routeCoordinates = [];
+      instructions = [];
+      
+      // Clear search
+      document.getElementById('search').value = '';
+    });
+
+    // AR mode
+    document.getElementById('ar-btn').addEventListener('click', () => {
+      if (!isARModeEnabled) {
+        isARModeEnabled = true;
+        arContainer.classList.add('active');
+        document.getElementById('ar-btn').disabled = true;
+        startAR();
+      }
+    });
+
+    // Close AR
+    document.getElementById('ar-close-btn').addEventListener('click', () => {
+      arContainer.classList.remove('active');
+      isARModeEnabled = false;
+      document.getElementById('ar-btn').disabled = false;
+      
+      // Stop video tracks
+      const videoElem = document.getElementById('video');
+      if (videoElem.srcObject) {
+        videoElem.srcObject.getTracks().forEach(track => track.stop());
+      }
+    });
+
+    // Bottom sheet toggle
+    bottomSheetHandle.addEventListener('click', () => {
+      bottomSheetExpanded = !bottomSheetExpanded;
+      bottomSheet.classList.toggle('expanded', bottomSheetExpanded);
+    });
+
+    // Map controls
+    document.getElementById('zoom-in-btn').addEventListener('click', () => {
+      map.zoomIn();
+    });
+    
+    document.getElementById('zoom-out-btn').addEventListener('click', () => {
+      map.zoomOut();
+    });
+    
+    document.getElementById('locate-me-btn').addEventListener('click', () => {
+      getUserLocation();
+    });
+    
+    document.getElementById('layers-btn').addEventListener('click', () => {
+      mapLayersVisible = !mapLayersVisible;
+      document.getElementById('layers-btn').classList.toggle('active', mapLayersVisible);
+      
+      // In a real app, this would show a layers panel
+      showNotification('Map layers feature coming soon!', 'info');
+    });
+
+    /*********************
      * INITIALIZE APP
      *********************/
-    getUserLocation(() => {});
+    // Get user location on startup
+    getUserLocation();
+    
+    // Start watching user location
     watchUserLocation();
   </script>
 </body>
