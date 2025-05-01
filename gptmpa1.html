@@ -251,8 +251,13 @@
     }
     
     #ar-container.active { 
-      height: 50vh;
+      height: 60vh;
       box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
+    }
+    
+    #ar-container.fullscreen {
+      height: 100vh !important;
+      border-radius: 0;
     }
     
     #ar-container video {
@@ -298,6 +303,90 @@
     
     .ar-controls button:hover {
       background: rgba(0, 0, 0, 0.7);
+    }
+
+    /* AR Navigation UI */
+    .ar-navigation-ui {
+      position: absolute;
+      bottom: 30px;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .ar-direction-indicator {
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius-full);
+      padding: 12px 24px;
+      color: white;
+      font-weight: 500;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .ar-compass {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius-full);
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 20;
+    }
+
+    .ar-compass-inner {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(58, 134, 255, 0.2);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ar-compass-needle {
+      position: absolute;
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(to bottom, #ff006e 0%, #ff006e 50%, white 50%, white 100%);
+      transform-origin: center center;
+      transition: transform 0.3s ease;
+    }
+
+    .ar-distance-meter {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius-full);
+      padding: 8px 16px;
+      color: white;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 20;
     }
 
     /* Leaflet Routing Machine */
@@ -421,6 +510,75 @@
       }
     }
 
+    /* AR Navigation Arrow */
+    .ar-navigation-arrow {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 20px;
+      transform-origin: center center;
+      transition: transform 0.3s ease-out;
+    }
+
+    .ar-arrow-outer {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      animation: pulse-subtle 2s infinite;
+    }
+
+    .ar-arrow-inner {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(58, 134, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ar-arrow-pointer {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 30px solid var(--primary);
+      transform-origin: center 70%;
+      top: -5px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    .ar-arrow-dot {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    @keyframes pulse-subtle {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
     /* Mobile Optimization */
     @media (max-width: 768px) {
       .top-bar { 
@@ -448,6 +606,16 @@
       
       #ar-container.active { 
         height: 60vh; 
+      }
+
+      .ar-navigation-arrow {
+        width: 100px;
+        height: 100px;
+      }
+
+      .ar-arrow-inner {
+        width: 70px;
+        height: 70px;
       }
     }
     
@@ -477,6 +645,22 @@
       
       .info-panel p {
         font-size: 13px;
+      }
+
+      .ar-navigation-arrow {
+        width: 90px;
+        height: 90px;
+      }
+
+      .ar-arrow-inner {
+        width: 60px;
+        height: 60px;
+      }
+
+      .ar-arrow-pointer {
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+        border-bottom: 24px solid var(--primary);
       }
     }
   </style>
@@ -509,9 +693,36 @@
   <div id="ar-container">
     <video id="video" autoplay playsinline muted></video>
     <canvas id="ar-canvas"></canvas>
+    
+    <div class="ar-compass">
+      <div class="ar-compass-inner">
+        <div class="ar-compass-needle" id="compass-needle"></div>
+      </div>
+    </div>
+    
     <div class="ar-controls">
       <button id="close-ar"><i class="fas fa-times"></i></button>
       <button id="toggle-fullscreen-ar"><i class="fas fa-expand"></i></button>
+    </div>
+    
+    <div class="ar-navigation-ui">
+      <div class="ar-navigation-arrow" id="ar-navigation-arrow">
+        <div class="ar-arrow-outer">
+          <div class="ar-arrow-inner">
+            <div class="ar-arrow-pointer" id="ar-arrow-pointer"></div>
+            <div class="ar-arrow-dot"></div>
+          </div>
+        </div>
+      </div>
+      <div class="ar-direction-indicator" id="ar-direction-text">
+        <i class="fas fa-directions"></i>
+        <span>Follow the arrow</span>
+      </div>
+    </div>
+    
+    <div class="ar-distance-meter" id="ar-distance-meter">
+      <i class="fas fa-map-marker-alt"></i>
+      <span id="ar-distance-text">0.00 km</span>
     </div>
   </div>
   
@@ -549,8 +760,14 @@
     let routeCoordinates = [];
     let instructions = [];
     let deviceOrientationListenerAdded = false;
+    let nextWaypointIndex = 0;
     const loadingIndicator = document.getElementById('loading-indicator');
     const infoPanel = document.getElementById('info-panel');
+    const arNavigationArrow = document.getElementById('ar-navigation-arrow');
+    const arArrowPointer = document.getElementById('ar-arrow-pointer');
+    const compassNeedle = document.getElementById('compass-needle');
+    const arDirectionText = document.getElementById('ar-direction-text');
+    const arDistanceText = document.getElementById('ar-distance-text');
 
     // Create custom user location marker
     function createUserMarker(latlng) {
@@ -661,6 +878,10 @@
             
             if (destinationLatLng && routingControl) {
               updateNavigationInfo(userLatLng);
+              
+              if (isARModeEnabled) {
+                updateARNavigation(userLatLng);
+              }
             }
           },
           (error) => {
@@ -714,6 +935,7 @@
         const routes = e.routes[0];
         routeCoordinates = routes.coordinates;
         instructions = routes.instructions;
+        nextWaypointIndex = 0;
         
         updateNavigationInfo(userLatLng);
         infoPanel.classList.add('active');
@@ -744,15 +966,41 @@
         minute: '2-digit' 
       });
       
-      const nextInstruction = instructions.find(instr => {
-        const point = routeCoordinates[instr.index];
-        return L.latLng(point.lat, point.lng).distanceTo(userLatLng) > 5;
-      }) || { text: 'Arrived at destination' };
+      // Find next instruction
+      let nextInstruction = { text: 'Arrived at destination' };
+      let minDistance = Infinity;
+      let closestIndex = 0;
+      
+      // Find the closest point on the route to the user
+      for (let i = 0; i < routeCoordinates.length; i++) {
+        const point = routeCoordinates[i];
+        const distance = L.latLng(point.lat, point.lng).distanceTo(userLatLng);
+        
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestIndex = i;
+        }
+      }
+      
+      // Find the next instruction after the closest point
+      for (let i = 0; i < instructions.length; i++) {
+        if (instructions[i].index > closestIndex) {
+          nextInstruction = instructions[i];
+          nextWaypointIndex = i;
+          break;
+        }
+      }
 
       document.getElementById('distance').innerHTML = `${totalDistance.toFixed(2)} km`;
       document.getElementById('time').innerHTML = `${totalTime.toFixed(1)} mins`;
       document.getElementById('eta').innerHTML = eta;
       document.getElementById('next-step').innerHTML = nextInstruction.text;
+      
+      // Update AR direction text if AR is enabled
+      if (isARModeEnabled) {
+        arDirectionText.innerHTML = `<i class="fas fa-directions"></i><span>${nextInstruction.text}</span>`;
+        arDistanceText.innerHTML = `${totalDistance.toFixed(2)} km`;
+      }
     }
 
     /*********************
@@ -998,7 +1246,7 @@
       
       if (arContainer.classList.contains('fullscreen')) {
         arContainer.classList.remove('fullscreen');
-        arContainer.style.height = '50vh';
+        arContainer.style.height = '60vh';
         document.getElementById('toggle-fullscreen-ar').innerHTML = '<i class="fas fa-expand"></i>';
       } else {
         arContainer.classList.add('fullscreen');
@@ -1018,12 +1266,9 @@
             arrowCanvas.width = video.videoWidth;
             arrowCanvas.height = video.videoHeight;
             
-            const updateFrame = () => {
-              if (isARModeEnabled) updateAR(currentHeading);
-              requestAnimationFrame(updateFrame);
-            };
-            
-            updateFrame();
+            if (userMarker && destinationLatLng) {
+              updateARNavigation(userMarker.getLatLng());
+            }
           });
         })
         .catch((err) => {
@@ -1057,74 +1302,83 @@
     }
 
     function handleOrientation(event) {
-      currentHeading = event.alpha || 0;
-      if (destinationLatLng && isARModeEnabled) updateAR(currentHeading);
+      // Get device orientation
+      let heading = event.alpha || 0;
+      
+      // Update compass needle
+      if (compassNeedle) {
+        compassNeedle.style.transform = `rotate(${heading}deg)`;
+      }
+      
+      currentHeading = heading;
+      
+      if (destinationLatLng && isARModeEnabled && userMarker) {
+        updateARNavigation(userMarker.getLatLng());
+      }
     }
 
-    function updateAR(compassHeading) {
-      if (!destinationLatLng || !userMarker) return;
+    function updateARNavigation(userLatLng) {
+      if (!destinationLatLng || !isARModeEnabled) return;
       
-      const userLatLng = userMarker.getLatLng();
+      // Calculate bearing to destination
       const destinationHeading = calculateHeading(userLatLng, destinationLatLng);
-      const arrowRotation = (compassHeading - destinationHeading + 360) % 360;
       
-      arrowContext.clearRect(0, 0, arrowCanvas.width, arrowCanvas.height);
-      drawArrow(arrowContext, arrowCanvas.width / 2, arrowCanvas.height / 2, arrowRotation);
+      // Calculate relative angle (where to point the arrow)
+      const relativeAngle = (destinationHeading - currentHeading + 360) % 360;
       
-      // Add distance indicator
+      // Update arrow rotation
+      arArrowPointer.style.transform = `rotate(${relativeAngle}deg)`;
+      
+      // Calculate distance to destination
       const distance = userLatLng.distanceTo(destinationLatLng);
-      arrowContext.font = 'bold 24px Poppins, sans-serif';
-      arrowContext.fillStyle = 'white';
-      arrowContext.textAlign = 'center';
-      arrowContext.shadowColor = 'rgba(0, 0, 0, 0.5)';
-      arrowContext.shadowBlur = 5;
-      arrowContext.fillText(`${(distance / 1000).toFixed(2)} km`, arrowCanvas.width / 2, arrowCanvas.height - 50);
-    }
-
-    // Draw a more realistic 3D arrow using gradient and shadow
-    function drawArrow(ctx, x, y, rotation) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(rotation * Math.PI / 180);
-      ctx.shadowBlur = 15;
-      ctx.shadowColor = "rgba(0, 0, 0, 0.7)";
+      arDistanceText.innerHTML = distance < 1000 ? 
+        `${distance.toFixed(0)} m` : 
+        `${(distance / 1000).toFixed(2)} km`;
       
-      // Create gradient for a 3D effect
-      let gradient = ctx.createLinearGradient(-20, -70, 20, 0);
-      gradient.addColorStop(0, "#3a86ff");
-      gradient.addColorStop(1, "#4361ee");
+      // Update direction text based on angle
+      let directionText = '';
+      if (relativeAngle >= 337.5 || relativeAngle < 22.5) {
+        directionText = 'Continue straight ahead';
+      } else if (relativeAngle >= 22.5 && relativeAngle < 67.5) {
+        directionText = 'Turn slightly right';
+      } else if (relativeAngle >= 67.5 && relativeAngle < 112.5) {
+        directionText = 'Turn right';
+      } else if (relativeAngle >= 112.5 && relativeAngle < 157.5) {
+        directionText = 'Turn sharp right';
+      } else if (relativeAngle >= 157.5 && relativeAngle < 202.5) {
+        directionText = 'Turn around';
+      } else if (relativeAngle >= 202.5 && relativeAngle < 247.5) {
+        directionText = 'Turn sharp left';
+      } else if (relativeAngle >= 247.5 && relativeAngle < 292.5) {
+        directionText = 'Turn left';
+      } else if (relativeAngle >= 292.5 && relativeAngle < 337.5) {
+        directionText = 'Turn slightly left';
+      }
       
-      // Draw arrow shape
-      ctx.beginPath();
-      ctx.moveTo(-20, -70);
-      ctx.lineTo(20, -70);
-      ctx.lineTo(20, 0);
-      ctx.lineTo(40, 0);
-      ctx.lineTo(0, 100);
-      ctx.lineTo(-40, 0);
-      ctx.lineTo(-20, 0);
-      ctx.closePath();
+      // Get next instruction if available
+      let instructionText = '';
+      if (nextWaypointIndex < instructions.length) {
+        instructionText = instructions[nextWaypointIndex].text;
+      } else {
+        instructionText = 'Arrived at destination';
+      }
       
-      // Add 3D effect with gradient
-      ctx.fillStyle = gradient;
-      ctx.fill();
+      // Update direction indicator
+      arDirectionText.innerHTML = `
+        <i class="fas fa-directions"></i>
+        <span>${distance < 30 ? instructionText : directionText}</span>
+      `;
       
-      // Add highlight
-      ctx.beginPath();
-      ctx.moveTo(-10, -60);
-      ctx.lineTo(10, -60);
-      ctx.lineTo(10, -10);
-      ctx.lineTo(-10, -10);
-      ctx.closePath();
-      ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
-      ctx.fill();
-      
-      // Add outline
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "#fff";
-      ctx.stroke();
-      
-      ctx.restore();
+      // If very close to destination, show arrival message
+      if (distance < 10) {
+        arDirectionText.innerHTML = `
+          <i class="fas fa-check-circle"></i>
+          <span>You have arrived at your destination</span>
+        `;
+        arArrowPointer.style.borderBottom = '30px solid var(--success)';
+      } else {
+        arArrowPointer.style.borderBottom = '30px solid var(--primary)';
+      }
     }
 
     function calculateHeading(from, to) {
