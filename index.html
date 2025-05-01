@@ -1,51 +1,206 @@
-<!DOCTYPE html >
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Railway Navigator - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="login-page">
     <div class="theme-toggle">
-        <button id="themeButton">Switch to Dark Mode</button>
+        <button id="modeToggle" class="mode-toggle"><i class="fas fa-moon"></i></button>
     </div>  
-    <div class="container">
-        <div class="right-section">
+    
+    <div class="login-container">
+        <div class="login-left">
+            <div class="login-image">
+                <div class="overlay"></div>
+                <div class="login-branding">
+                    <i class="fas fa-train-subway"></i>
+                    <h1>Railway Navigator</h1>
+                    <p>Enhancing your railway travel experience</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="login-right">
             <div class="form-intro">
                 <h1>Welcome Back!</h1>
                 <p>Please login to your account or sign up for a new one.</p>
             </div>
-            <div class="form-container" >
+            
+            <div class="form-container">
                 <div class="form-header">
-                    <button id="loginBtn " class="toggle-btn active">Login</button>
+                    <button id="loginBtn" class="toggle-btn active">Login</button>
                     <div class="separator"></div> 
                     <button id="signupBtn" class="toggle-btn">Sign Up</button>
                 </div>
                 
                 <form id="loginForm" class="form-content" onsubmit="return validateLogin()">
-                    <input type="text" id="username" placeholder="Email or Username" required>
-                    <input type="password" id="password" placeholder="Password" required>
-                    <a href="#" id="forgotPassword">Forgot Password?</a>
-                    <button type="submit " class="submit-btn">Login</button>
+                    <div class="form-group">
+                        <label for="username">Username or Email</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="username" placeholder="Enter your username" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" placeholder="Enter your password" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember">
+                            <label for="remember">Remember me</label>
+                        </div>
+                        <a href="#" id="forgotPassword" class="forgot-link">Forgot Password?</a>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <span>Login</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
                 </form>
+                
                 <form id="signupForm" class="form-content hidden">
-                    <input type="text" placeholder="Name" required>
-                    <input type="email" placeholder="Email" required>
-                    <input type="password" placeholder="Password" required>
-                    <input type="password" placeholder="Confirm Password" required>
-                    <button type="submit" class="submit-btn">Sign Up</button>
+                    <div class="form-group">
+                        <label for="signup-name">Full Name</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="signup-name" placeholder="Enter your full name" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="signup-email" placeholder="Enter your email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="signup-password" placeholder="Create a password" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-confirm">Confirm Password</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="signup-confirm" placeholder="Confirm your password" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <span>Create Account</span>
+                        <i class="fas fa-user-plus"></i>
+                    </button>
                 </form>
+                
                 <form id="forgotForm" class="form-content hidden">
-                    <input type="email" placeholder="Enter your email" required>
-                    <button type="submit" class="submit-btn">Reset Password</button>
+                    <div class="form-group">
+                        <label for="reset-email">Email Address</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="reset-email" placeholder="Enter your email" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <span>Reset Password</span>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                    
+                    <button type="button" id="backToLogin" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Back to Login</span>
+                    </button>
                 </form>
             </div>
         </div>
     </div>
-    <script src="scripts.js"></script>
+    
     <script>
-        // beginning of the web application
+        // Theme toggle functionality
+        const modeToggle = document.getElementById('modeToggle');
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        // Check if user has a preference stored
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && prefersDarkScheme.matches)) {
+            document.body.classList.add('dark-mode');
+            modeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        } else {
+            modeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        }
+        
+        modeToggle.addEventListener('click', function () {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            
+            if (isDarkMode) {
+                modeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                modeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+        
+        // Form toggle functionality
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const forgotPassword = document.getElementById('forgotPassword');
+        const backToLogin = document.getElementById('backToLogin');
+        
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const forgotForm = document.getElementById('forgotForm');
+        
+        loginBtn.addEventListener('click', function() {
+            loginBtn.classList.add('active');
+            signupBtn.classList.remove('active');
+            loginForm.classList.remove('hidden');
+            signupForm.classList.add('hidden');
+            forgotForm.classList.add('hidden');
+        });
+        
+        signupBtn.addEventListener('click', function() {
+            signupBtn.classList.add('active');
+            loginBtn.classList.remove('active');
+            signupForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+            forgotForm.classList.add('hidden');
+        });
+        
+        forgotPassword.addEventListener('click', function(e) {
+            e.preventDefault();
+            forgotForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+            signupForm.classList.add('hidden');
+            loginBtn.classList.remove('active');
+            signupBtn.classList.remove('active');
+        });
+        
+        backToLogin.addEventListener('click', function() {
+            loginBtn.classList.add('active');
+            signupBtn.classList.remove('active');
+            loginForm.classList.remove('hidden');
+            forgotForm.classList.add('hidden');
+        });
+        
+        // Login validation
         function validateLogin() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
@@ -55,12 +210,57 @@
             const validPassword = "User@5456";
 
             if (username === validUsername && password === validPassword) {
-                window.location.href = "dashboard1.html";
+                window.location.href = "dashboard.html";
                 return false; // Prevent form submission
             } else {
-                alert("Invalid username or password");
+                // Show error message
+                showNotification('Invalid username or password', 'error');
                 return false; // Prevent form submission
             }
+        }
+        
+        // Helper function to show notifications
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas fa-${type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Add styles dynamically
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.backgroundColor = type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#3a86ff';
+            notification.style.color = 'white';
+            notification.style.padding = '12px 20px';
+            notification.style.borderRadius = '8px';
+            notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            notification.style.zIndex = '2000';
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateY(-20px)';
+            notification.style.transition = 'opacity 0.3s, transform 0.3s';
+            
+            // Animation
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateY(0)';
+            }, 10);
+            
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(-20px)';
+                
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 4000);
         }
     </script>
 </body>
