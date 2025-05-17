@@ -7,7 +7,7 @@ or you can just read the description for more details .
  Find the Deployed Link Here : https://nakulmak05.github.io/Railway-Navigator/
  <br/>
  
-# Railway Navigator     
+# RailNav: Smart Railway Navigation System     
 
 **Railway Navigator** app enhances the navigation experience within railway stations through the integration of real-time data, augmented reality technology, and vital station information. Here is an in-depth view about how the **Railway Station Navigation** system functions through the application interface:  
      
