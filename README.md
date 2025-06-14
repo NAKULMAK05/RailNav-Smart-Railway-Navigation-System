@@ -4,7 +4,7 @@ for detailed explanation watch this YouTube Video:-**https://www.youtube.com/wat
 <br>
 or you can just read the description for more details .  
  <br/>
- Find the Deployed Link Here : https://nakulmak05.github.io/Railway-Navigator/
+ Find the Deployed Link Here : https://nakulmak05.github.io/RailNav-Smart-Railway-Navigation-System/
  <br/>
 
  ---
